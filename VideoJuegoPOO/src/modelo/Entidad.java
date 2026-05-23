@@ -62,6 +62,19 @@ public class Entidad {
 	        }
 	    }
 	
+	public void aumentarVel(int cantidad) {
+		this.velocidad += cantidad;
+		
+	}
+	
+	public void aumentarAtaque(int cantidad) {
+		this.ataque += cantidad;
+	}
+	
+	public void aumentarDefensa(int cantidad) {
+		this.defensa += cantidad;
+	}
+	
 	public void defenderse() {
 	        this.estaDefendiendo = true;
 	    }
@@ -124,8 +137,5 @@ public class Entidad {
 	public void setEstaDefendiendo(boolean estaDefendiendo) {
 		this.estaDefendiendo = estaDefendiendo;
 	}
-	
-	
-	
-	
+
 }
