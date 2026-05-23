@@ -14,7 +14,7 @@ public class Asesino extends Heroe {
             0, 1,		// experiencia, nivel
             120, 0, 0,  // energia, mana, manaMax
             40, 200,    // prob crit, daño crit 
-            null, arma, armadura);
+            null, arma, armadura);//Habilidades, arma, armadura
         //this.sigilo = false;
     }
 

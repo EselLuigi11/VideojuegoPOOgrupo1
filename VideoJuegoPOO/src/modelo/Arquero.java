@@ -3,19 +3,19 @@ package modelo;
 import java.util.List;
 
 public class Arquero extends Heroe {
-
+	//Decidir si ponemos limite o no de flechas. Si no, quitamos las lineas comentadas.
     //private int flechasMax;
     //private int flechasActuales;
 
     public Arquero(String nombre, Arma arma, Armadura armadura) {
         super(nombre,
-            95, 95,     // vida media
-            28, 10, 18, // ataque alto, defensa baja, velocidad alta
-            false,
-            0, 1,
-            100, 0, 0,  // usa energía
-            30, 160,    // prob crit alta, daño crit alto
-            null, arma, armadura);
+            95, 95,     // vida, vidamax
+            28, 10, 18, // ataque, defensa, velocidad
+            false,		//estaDefendiendo
+            0, 1,		// experiencia, nivel
+            100, 0, 0,  // energia, mana, manaMax
+            30, 160,    // prob crit, daño crit 
+            null, arma, armadura); //Habilidades, arma, armadura
         //this.flechasMax = 20;
         //this.flechasActuales = 20;
     }
