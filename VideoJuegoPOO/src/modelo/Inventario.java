@@ -3,11 +3,11 @@ package modelo;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Inventario {
-    private List<Item> items;
+public class inventario {
+	private List<Item> items;
     private int capacidad;
 
-    public Inventario(int capacidad) {
+    public inventario(int capacidad) {
         this.capacidad = capacidad;
         this.items = new ArrayList<>();
     }
@@ -36,6 +36,21 @@ public class Inventario {
         }
         return null;
     }
+    
+    
+    public void usarItem(String nombre, Heroe heroe) {
+    	Item item = buscarItem(nombre);
+    	
+    	if(item != null) {
+    		item.usar(heroe);
+    		
+    		eliminarItem(item);
+    		
+    		
+    	}else {
+    		System.out.println("No tienes el objeto");
+    	}
+    }
 
     // Getters por tipo, útil para mostrar solo armas, solo pociones, etc.
     public List<Arma> getArmas() {
@@ -62,8 +77,21 @@ public class Inventario {
         return pociones;
     }
 
-    public boolean estaLleno() { return items.size() >= capacidad; }
-    public int getCantidadActual() { return items.size(); }
-    public int getCapacidad() { return capacidad; }
-    public List<Item> getItems() { return items; }
+    public boolean estaLleno() { 
+    	return items.size() >= capacidad; 
+    	
+    }
+    public int getCantidadActual() { 
+    	return items.size(); 
+    	
+    }
+    public int getCapacidad() { 
+    	return capacidad; 
+    	
+    }
+    public List<Item> getItems() { 
+    	return items; 
+    	
+    }
+
 }
