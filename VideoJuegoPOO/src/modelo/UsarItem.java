@@ -11,18 +11,15 @@ public class UsarItem implements Accion {
 
     @Override
     public void ejecutar() {
-        // 1. Comunicarse con el Inventario (código de Franco)
         Inventario inventario = partida.getInventario();
         
-        // 2. Verificar si existe y sacarlo de la mochila
         if (inventario.contieneItem(item)) {
             inventario.eliminarItem(item);
-            System.out.println("🎒 " + heroe.getNombre() + " saca " + item.getNombre() + " de la mochila.");
+            System.out.println(heroe.getNombre() + " saca " + item.getNombre() + " de la mochila.");
             
-            // 3. El ítem se aplica a sí mismo (Corrección del profe)
             item.usar(heroe); 
         } else {
-            System.out.println("❌ Error: El ítem " + item.getNombre() + " no está en el inventario.");
+            System.out.println("Error: El ítem " + item.getNombre() + " no está en el inventario.");
         }
     }
 }
