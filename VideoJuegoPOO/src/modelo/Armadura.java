@@ -1,5 +1,7 @@
 package modelo;
 
+import modelo.Entidades.Heroe;
+
 public class Armadura extends Item {
 	private int defensa;
 	

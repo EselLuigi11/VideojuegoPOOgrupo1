@@ -1,31 +1,33 @@
 package modelo;
 
+import modelo.Entidades.Heroe;
+
 public class Arma extends Item {
-	private int daño;
+	private int plusdaño;
 	
 	public Arma(String nombre, String descripcion, int daño) {
 		super(nombre, descripcion);
-		this.daño = daño;
+		this.plusdaño = daño;
 	}
 	
 	public void usar(Heroe heroe) {
-		heroe.aumentarAtaque(daño);
+		heroe.aumentarAtaque(plusdaño);
 		System.out.println("Arma equipada");
 		
 	}
 
-	public int getDaño() {
-		return daño;
+	public int getPlusDaño() {
+		return plusdaño;
 	}
 
-	public void setDaño(int daño) {
-		this.daño = daño;
+	public void setPlusDaño(int plusdaño) {
+		this.plusdaño = plusdaño;
 	}
 	
 	public String toString() {
 		return super.toString() + 
 				"| Daño: " +
-				daño;
+				plusdaño;
 	}
 
 }

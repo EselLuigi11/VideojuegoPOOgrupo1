@@ -1,3 +1,5 @@
+package modelo;
+
 public class Curar implements Accion {
     private Entidad curador;
     private Entidad objetivo;

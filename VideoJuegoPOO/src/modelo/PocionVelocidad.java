@@ -1,5 +1,7 @@
 package modelo;
 
+import modelo.Entidades.Heroe;
+
 public class PocionVelocidad extends Pocion {
 	private int aumentoVel;
 	

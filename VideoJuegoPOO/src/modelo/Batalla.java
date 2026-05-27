@@ -1,6 +1,10 @@
 package modelo;
 
 import java.util.List;
+
+import modelo.Entidades.Enemigo;
+import modelo.Entidades.Heroe;
+
 import java.util.ArrayList;
 
 public class Batalla {

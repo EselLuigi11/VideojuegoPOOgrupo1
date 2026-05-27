@@ -1,3 +1,7 @@
+package modelo;
+
+import modelo.Entidades.Heroe;
+
 public class UsarItem implements Accion {
     private Partida partida;
     private Heroe heroe; 

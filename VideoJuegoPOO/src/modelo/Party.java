@@ -3,6 +3,9 @@ package modelo;
 import java.util.ArrayList;
 import java.util.List;
 
+import modelo.Entidades.Curador;
+import modelo.Entidades.Heroe;
+
 public class Party {
 
     private String nombreParty;

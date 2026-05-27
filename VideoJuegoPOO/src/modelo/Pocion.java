@@ -1,5 +1,7 @@
 package modelo;
 
+import modelo.Entidades.Heroe;
+
 public class Pocion extends Item {
 	private int curacion;
 	

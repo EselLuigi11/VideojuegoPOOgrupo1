@@ -1,3 +1,5 @@
+package modelo;
+
 public class Atacar implements Accion {
     private Entidad atacante;
     private Entidad objetivo;

@@ -1,8 +1,10 @@
-package modelo;
+package modelo.Entidades;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import modelo.Entidad;
 
 public class Enemigo extends Entidad {
 	//Enum para identificar qué tipo de enemigo es y mapear su comportamiento de IA

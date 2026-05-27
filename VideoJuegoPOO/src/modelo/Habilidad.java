@@ -1,9 +1,11 @@
-public class HabilidadEsp implements Accion {
+package modelo;
+
+public class Habilidad implements Accion {
     private Entidad usuario;
     private Entidad objetivo;
     private String nombreHabilidad;
 
-    public HabilidadEsp(Entidad usuario, Entidad objetivo, String nombreHabilidad) {
+    public Habilidad(Entidad usuario, Entidad objetivo, String nombreHabilidad) {
         this.usuario = usuario;
         this.objetivo = objetivo;
         this.nombreHabilidad = nombreHabilidad;

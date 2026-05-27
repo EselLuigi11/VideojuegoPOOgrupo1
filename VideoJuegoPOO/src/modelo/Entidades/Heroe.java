@@ -1,6 +1,9 @@
-package modelo;
+package modelo.Entidades;
 
 import java.util.List;
+
+import modelo.Entidad;
+
 import java.util.ArrayList;
 
 public class Heroe extends Entidad {
@@ -13,8 +16,8 @@ public class Heroe extends Entidad {
 	private int probCrit;
 	private int danoCrit;
 	private List<Habilidad> habilidades;
-	private Arma arma;
-	private Armadura armadura;
+	private modelo.Arma arma;
+	private modelo.Armadura armadura;
 	
 	
 	
@@ -37,7 +40,7 @@ public class Heroe extends Entidad {
 	public int calcularDanoBase() {
 		int danoTotal = this.getAtaque();
 		if (arma != null) {
-			danoTotal += arma.getPlusDano();
+			danoTotal += arma.getPlusDaño();
 		}
 		return danoTotal;
 	}

@@ -3,11 +3,13 @@ package modelo;
 import java.util.ArrayList;
 import java.util.List;
 
-public class inventario {
+import modelo.Entidades.Heroe;
+
+public class Inventario {
 	private List<Item> items;
     private int capacidad;
 
-    public inventario(int capacidad) {
+    public Inventario(int capacidad) {
         this.capacidad = capacidad;
         this.items = new ArrayList<>();
     }
@@ -52,6 +54,10 @@ public class inventario {
     	}
     }
 
+    
+    
+    
+    
     // Getters por tipo, útil para mostrar solo armas, solo pociones, etc.
     public List<Arma> getArmas() {
         List<Arma> armas = new ArrayList<>();
