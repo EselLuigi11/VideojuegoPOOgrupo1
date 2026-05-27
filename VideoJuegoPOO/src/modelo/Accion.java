@@ -1,5 +1,3 @@
-package modelo;
-
-public class Accion {
-
+public interface Accion {
+    void ejecutar();
 }
