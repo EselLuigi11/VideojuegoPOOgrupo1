@@ -11,8 +11,7 @@ public class Atacar implements Accion {
 
     @Override
     public void ejecutar() {
-        System.out.println("⚔️ " + atacante.getNombre() + " ataca a " + objetivo.getNombre() + " por " + dano + " de daño.");
-        // Acá llamamos al método que está programando Ignacio
+        System.out.println(atacante.getNombre() + " ataca a " + objetivo.getNombre() + " por " + dano + " de daño.");
         objetivo.recibirDano(dano); 
     }
 }
