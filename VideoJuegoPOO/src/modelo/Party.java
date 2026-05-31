@@ -3,8 +3,8 @@ package modelo;
 import java.util.ArrayList;
 import java.util.List;
 
-import modelo.Entidades.Curador;
-import modelo.Entidades.Heroe;
+import modelo.entidades.Curador;
+import modelo.entidades.Heroe;
 
 public class Party {
 
@@ -97,7 +97,7 @@ public class Party {
         if (inventarioArmas.contains(arma)) {
             // Si el héroe ya tenía un arma, la devuelve al inventario
             if (heroe.getArma() != null) {
-                inventarioArmas.add(heroe.getArma());
+                inventarioArmas.add(modelo.entidades.getArma());
             }
             heroe.setArma(arma);
             inventarioArmas.remove(arma);

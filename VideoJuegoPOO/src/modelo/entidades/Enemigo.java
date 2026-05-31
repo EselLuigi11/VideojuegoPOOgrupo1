@@ -1,4 +1,4 @@
-package modelo.Entidades;
+package modelo.entidades;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ public class Enemigo extends Entidad {
 		super(nombre, vida, vidaMax, ataque, defensa, velocidad, estaDefendiendo);
 		this.experienciaOtorgada = 0;
 		this.nivelEnemigo = 1;
-		this.tipo = TipoEnemigo.GOBLIN ; 
+		this.tipo = tipo ; 
 		//default goblin, desp se cambia al crear el enemigo para x batalla/nivel.
 		}
 	// Método para que el enemigo ataque al héroe
@@ -88,9 +88,8 @@ public class Enemigo extends Entidad {
 			 cantDano *= 0.7; // 30% menos por defensa activa
 			 return (int) cantDano;
 		}
-		else {
-			cantDano = cantDano; // Dano sin reducción x estadistica de defensa.
-			return (int) cantDano;
+		else { 
+			return (int) cantDano; // Dano sin reducción x estadistica de defensa.
 		}
 	}
 	

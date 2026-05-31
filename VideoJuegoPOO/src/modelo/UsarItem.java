@@ -1,6 +1,6 @@
 package modelo;
 
-import modelo.Entidades.Heroe;
+import modelo.entidades.Heroe;
 
 public class UsarItem implements Accion {
     private Partida partida;
@@ -15,7 +15,7 @@ public class UsarItem implements Accion {
 
     @Override
     public void ejecutar() {
-        Inventario inventario = partida.getInventario();
+        Inventario inventario = partida.getInventarioPartida();
         
         if (inventario.contieneItem(item)) {
             inventario.eliminarItem(item);

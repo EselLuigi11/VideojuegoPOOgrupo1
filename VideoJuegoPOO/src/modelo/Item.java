@@ -1,6 +1,6 @@
 package modelo;
 
-import modelo.Entidades.Heroe;
+import modelo.entidades.Heroe;
 
 public abstract class Item {
 	private String nombre;

@@ -2,8 +2,8 @@ package modelo;
 
 import java.util.List;
 
-import modelo.Entidades.Enemigo;
-import modelo.Entidades.Heroe;
+import modelo.entidades.Enemigo;
+import modelo.entidades.Heroe;
 
 import java.util.ArrayList;
 

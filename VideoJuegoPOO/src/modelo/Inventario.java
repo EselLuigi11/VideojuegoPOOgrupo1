@@ -3,7 +3,7 @@ package modelo;
 import java.util.ArrayList;
 import java.util.List;
 
-import modelo.Entidades.Heroe;
+import modelo.entidades.Heroe;
 
 public class Inventario {
 	private List<Item> items;
@@ -87,6 +87,13 @@ public class Inventario {
     	return items.size() >= capacidad; 
     	
     }
+    
+    public boolean contienteItem(Item item) {
+    	return items.contains(item); // contains es metodo q verifica si item esta en lista.
+    }
+    
+    
+    // Getters y setters
     public int getCantidadActual() { 
     	return items.size(); 
     	

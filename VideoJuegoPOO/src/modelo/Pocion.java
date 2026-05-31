@@ -1,6 +1,6 @@
 package modelo;
 
-import modelo.Entidades.Heroe;
+import modelo.entidades.Heroe;
 
 public class Pocion extends Item {
 	private int curacion;

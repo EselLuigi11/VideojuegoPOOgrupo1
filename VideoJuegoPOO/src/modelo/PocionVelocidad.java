@@ -1,6 +1,6 @@
 package modelo;
 
-import modelo.Entidades.Heroe;
+import modelo.entidades.Heroe;
 
 public class PocionVelocidad extends Pocion {
 	private int aumentoVel;
