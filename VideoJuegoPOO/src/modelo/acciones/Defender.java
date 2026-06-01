@@ -1,6 +1,9 @@
 package modelo.acciones;
 
-public class Defender implements Accion {
+import modelo.Accion;
+import modelo.Entidad;
+
+public class Defender extends Accion {
     private Entidad defensor;
 
     public Defender(Entidad defensor) {

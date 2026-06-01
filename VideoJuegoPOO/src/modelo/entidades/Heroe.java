@@ -2,7 +2,10 @@ package modelo.entidades;
 
 import java.util.List;
 
+import modelo.Arma;
+import modelo.Armadura;
 import modelo.Entidad;
+import modelo.acciones.Habilidad;
 
 import java.util.ArrayList;
 

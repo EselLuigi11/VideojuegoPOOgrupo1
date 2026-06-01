@@ -1,6 +1,8 @@
 package modelo.entidades;
 
 import java.util.List;
+import modelo.Arma;
+import modelo.Armadura;
 
 public class Guerrero extends Heroe {
 

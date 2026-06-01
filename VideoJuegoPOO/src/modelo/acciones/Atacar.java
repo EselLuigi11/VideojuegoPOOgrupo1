@@ -1,6 +1,9 @@
 package modelo.acciones;
 
-public class Atacar implements Accion {
+import modelo.Accion;
+import modelo.Entidad;
+
+public class Atacar extends Accion {
     private Entidad atacante;
     private Entidad objetivo;
     private int dano;

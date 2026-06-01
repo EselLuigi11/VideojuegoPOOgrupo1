@@ -1,6 +1,8 @@
 package modelo.entidades;
 
 import java.util.List;
+import modelo.Arma;
+import modelo.Armadura;
 
 public class Asesino extends Heroe {
 	//como idea, el asesino podría tener una habilidad de sigilo que le permita garantizar un ataque crítico en su próximo ataque, pero solo se puede usar una vez cada cierto tiempo o bajo ciertas condiciones. Esto lo haría un personaje más estratégico y emocionante de jugar, ya que el jugador tendría que decidir cuándo usar esa habilidad para maximizar su efectividad.

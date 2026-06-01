@@ -1,8 +1,12 @@
 package modelo.acciones;
 
+import modelo.Accion;
+import modelo.Inventario;
+import modelo.Item;
+import modelo.Partida;
 import modelo.entidades.Heroe;
 
-public class UsarItem implements Accion {
+public class UsarItem extends Accion {
     private Partida partida;
     private Heroe heroe; 
     private Item item;

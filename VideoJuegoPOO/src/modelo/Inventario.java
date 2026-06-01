@@ -88,7 +88,7 @@ public class Inventario {
     	
     }
     
-    public boolean contienteItem(Item item) {
+    public boolean contieneItem(Item item) {
     	return items.contains(item); // contains es metodo q verifica si item esta en lista.
     }
     

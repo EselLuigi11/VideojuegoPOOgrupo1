@@ -1,5 +1,6 @@
 package modelo;
 
-public interface Accion {
-    void ejecutar();
+public abstract class Accion {
+	
+	public abstract void ejecutar();
 }

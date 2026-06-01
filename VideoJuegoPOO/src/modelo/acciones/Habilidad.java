@@ -1,6 +1,9 @@
 package modelo.acciones;
 
-public class Habilidad implements Accion {
+import modelo.Accion;
+import modelo.Entidad;
+
+public class Habilidad extends Accion {
     private Entidad usuario;
     private Entidad objetivo;
     private String nombreHabilidad;

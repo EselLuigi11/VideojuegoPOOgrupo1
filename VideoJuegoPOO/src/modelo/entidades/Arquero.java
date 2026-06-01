@@ -2,6 +2,9 @@ package modelo.entidades;
 
 import java.util.List;
 
+import modelo.Arma;
+import modelo.Armadura;
+
 public class Arquero extends Heroe {
 	//Decidir si ponemos limite o no de flechas. Si no, quitamos las lineas comentadas.
     //private int flechasMax;

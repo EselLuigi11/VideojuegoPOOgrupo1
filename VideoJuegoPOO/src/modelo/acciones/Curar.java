@@ -1,6 +1,9 @@
 package modelo.acciones;
 
-public class Curar implements Accion {
+import modelo.Accion;
+import modelo.Entidad;
+
+public class Curar extends Accion {
     private Entidad curador;
     private Entidad objetivo;
     private int cantidad;
