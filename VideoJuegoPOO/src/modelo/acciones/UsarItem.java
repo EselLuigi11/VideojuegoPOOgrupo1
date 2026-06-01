@@ -1,4 +1,4 @@
-package modelo;
+package modelo.acciones;
 
 import modelo.entidades.Heroe;
 
