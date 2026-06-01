@@ -1,4 +1,4 @@
-package modelo;
+package modelo.acciones;
 
 public class Curar implements Accion {
     private Entidad curador;
