@@ -1,4 +1,4 @@
-package modelo;
+package modelo.acciones;
 
 public class Habilidad implements Accion {
     private Entidad usuario;
