@@ -9,14 +9,15 @@ public class Mago extends Heroe {
 
     public Mago(String nombre, Arma arma, Armadura armadura) {
         super(nombre,
-            75, 75,        // vida, vidaMax
-            15, 8, 16,     // ataque, defensa, velocidad
-            false,
-            0, 1,          // experiencia, nivel
-            60, 120, 120,  // energiaMax, mana, manaMax
-            20, 180,       // probCrit, danoCrit
-            null, arma, armadura);
-        this.poderMagico = 30;
+                75, 75,        // vida, vidaMax
+                15, 8, 16,     // ataque, defensa, velocidad
+                false,
+                0, 1,          // experiencia, nivel
+                60, 60,        // energia, energiaMax
+                120, 120,      // mana, manaMax
+                20, 180,       // probCrit, danoCrit
+                null, arma, armadura);
+            this.poderMagico = 30;
 
         // ── Tabla de niveles del Mago ──────────────────────────────────
         // Formato: tablaDeNiveles.put(nivel,

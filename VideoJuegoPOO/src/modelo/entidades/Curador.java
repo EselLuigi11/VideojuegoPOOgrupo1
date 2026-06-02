@@ -8,13 +8,14 @@ public class Curador extends Heroe {
 
     public Curador(String nombre, Arma arma, Armadura armadura) {
         super(nombre,
-            90, 90,      // vida, vidaMax
-            10, 12, 14,  // ataque, defensa, velocidad
-            false,       // estaDefendiendo
-            0, 1,        // experiencia, nivel
-            80, 80, 80,  // energiaMax, mana, manaMax
-            5, 100,      // probCrit, danoCrit
-            null, arma, armadura);
+                90, 90,      // vida, vidaMax
+                10, 12, 14,  // ataque, defensa, velocidad
+                false,       // estaDefendiendo
+                0, 1,        // experiencia, nivel
+                80, 80,      // energia, energiaMax
+                80, 80,      // mana, manaMax
+                5, 100,      // probCrit, danoCrit
+                null, arma, armadura);
 
         // ── Tabla de niveles del Curador ───────────────────────────────
         // Formato: tablaDeNiveles.put(nivel,

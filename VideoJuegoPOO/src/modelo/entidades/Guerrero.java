@@ -7,13 +7,14 @@ public class Guerrero extends Heroe {
  
     public Guerrero(String nombre, Arma arma, Armadura armadura) {
         super(nombre,
-            150, 150,   // vida, vidaMax
-            20, 25, 8,  // ataque, defensa, velocidad
-            false,
-            0, 1,       // experiencia, nivel inicial
-            100, 0, 0,  // energia, mana, manaMax
-            5, 150,     // probCrit, danoCrit
-            null, arma, armadura);
+                150, 150,   // vida, vidaMax
+                20, 25, 8,  // ataque, defensa, velocidad
+                false,
+                0, 1,       // experiencia, nivel inicial
+                100, 100,   // energia, energiaMax
+                0, 0,       // mana, manaMax (el Guerrero no usa mana)
+                5, 150,     // probCrit, danoCrit
+                null, arma, armadura);
  
         // ── Tabla de niveles del Guerrero ──────────────────────────
         // (vidaMax, ataque, defensa, velocidad, energiaMax, manaMax, probCrit, danoCrit)

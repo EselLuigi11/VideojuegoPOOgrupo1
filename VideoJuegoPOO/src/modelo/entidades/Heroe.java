@@ -107,14 +107,14 @@ public class Heroe extends Entidad {
  
         if (statsDelNivel != null) {
             // ── Camino A: stats definidos manualmente en la tabla ──
-            this.setVidaMax(StatsNivel.getVidaMax());
-            this.setAtaque(StatsNivel.getAtaque());
-            this.setDefensa(StatsNivel.getDefensa());
-            this.setVelocidad(StatsNivel.getVelocidad());
-            this.energiaMax = StatsNivel.getEnergiaMax();
-            this.manaMax    = StatsNivel.getManaMax();
-            this.probCrit   = StatsNivel.getProbCrit();
-            this.danoCrit   = StatsNivel.getDanoCrit();
+            this.setVidaMax(statsDelNivel.getVidaMax());
+            this.setAtaque(statsDelNivel.getAtaque());
+            this.setDefensa(statsDelNivel.getDefensa());
+            this.setVelocidad(statsDelNivel.getVelocidad());
+            this.energiaMax = statsDelNivel.getEnergiaMax();
+            this.manaMax    = statsDelNivel.getManaMax();
+            this.probCrit   = statsDelNivel.getProbCrit();
+            this.danoCrit   = statsDelNivel.getDanoCrit();
             System.out.println("  → Stats aplicados desde tabla: " + statsDelNivel);
         } else {
             // ── Camino B: incremento genérico de fallback ──

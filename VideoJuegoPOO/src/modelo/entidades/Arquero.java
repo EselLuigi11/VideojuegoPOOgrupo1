@@ -18,13 +18,14 @@ public class Arquero extends Heroe {
  
     public Arquero(String nombre, Arma arma, Armadura armadura) {
         super(nombre,
-            95, 95,      // vida, vidaMax
-            28, 10, 18,  // ataque, defensa, velocidad
-            false,       // estaDefendiendo
-            0, 1,        // experiencia, nivel
-            100, 0, 0,   // energiaMax, mana, manaMax
-            30, 160,     // probCrit, danoCrit
-            null, arma, armadura);
+                95, 95,      // vida, vidaMax
+                28, 10, 18,  // ataque, defensa, velocidad
+                false,       // estaDefendiendo
+                0, 1,        // experiencia, nivel
+                100, 100,    // energia, energiaMax
+                0, 0,        // mana, manaMax (el Arquero no usa mana)
+                30, 160,     // probCrit, danoCrit
+                null, arma, armadura);
  
        // ── Tabla de niveles del Arquero ───────────────────────────────
  // tablaDeNiveles.put(nivel, new StatsNivel(vidaMax, ataque, defensa, velocidad, energiaMax, manaMax, probCrit, danoCrit))

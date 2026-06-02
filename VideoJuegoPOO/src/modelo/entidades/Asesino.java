@@ -9,13 +9,14 @@ public class Asesino extends Heroe {
  
     public Asesino(String nombre, Arma arma, Armadura armadura) {
         super(nombre,
-            80, 80,      // vida, vidaMax
-            35, 8, 20,   // ataque, defensa, velocidad
-            false,       // estaDefendiendo
-            0, 1,        // experiencia, nivel
-            120, 0, 0,   // energiaMax, mana, manaMax
-            40, 200,     // probCrit, danoCrit
-            null, arma, armadura);
+                80, 80,      // vida, vidaMax
+                35, 8, 20,   // ataque, defensa, velocidad
+                false,       // estaDefendiendo
+                0, 1,        // experiencia, nivel
+                120, 120,    // energia, energiaMax
+                0, 0,        // mana, manaMax (el Asesino no usa mana)
+                40, 200,     // probCrit, danoCrit
+                null, arma, armadura);
  
         // ── Tabla de niveles del Asesino ───────────────────────────────
         // Formato: tablaDeNiveles.put(nivel,
