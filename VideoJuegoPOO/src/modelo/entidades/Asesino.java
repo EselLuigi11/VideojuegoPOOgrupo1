@@ -1,38 +1,36 @@
 package modelo.entidades;
-
-import java.util.List;
+ 
 import modelo.Arma;
 import modelo.Armadura;
-
+ 
 public class Asesino extends Heroe {
-	//como idea, el asesino podría tener una habilidad de sigilo que le permita garantizar un ataque crítico en su próximo ataque, pero solo se puede usar una vez cada cierto tiempo o bajo ciertas condiciones. Esto lo haría un personaje más estratégico y emocionante de jugar, ya que el jugador tendría que decidir cuándo usar esa habilidad para maximizar su efectividad.
-    //private boolean sigilo; // Si está en sigilo, el próximo ataque es crítico garantizado
-
+ 
+    // private boolean sigilo; // activar cuando implementen la habilidad
+ 
     public Asesino(String nombre, Arma arma, Armadura armadura) {
         super(nombre,
-            80, 80,     // vida, vidamax
-            35, 8, 20,  // ataque , defensa, velocidad
-            false,		//estaDefendiendo
-            0, 1,		// experiencia, nivel
-            120, 0, 0,  // energia, mana, manaMax
-            40, 200,    // prob crit, daño crit 
-            null, arma, armadura);//Habilidades, arma, armadura
-        //this.sigilo = false;
+            80, 80,      // vida, vidaMax
+            35, 8, 20,   // ataque, defensa, velocidad
+            false,       // estaDefendiendo
+            0, 1,        // experiencia, nivel
+            120, 0, 0,   // energiaMax, mana, manaMax
+            40, 200,     // probCrit, danoCrit
+            null, arma, armadura);
+ 
+        // ── Tabla de niveles del Asesino ───────────────────────────────
+        // Formato: tablaDeNiveles.put(nivel,
+        //     new StatsNivel(vidaMax, ataque, defensa, velocidad,
+        //                    energiaMax, manaMax, probCrit, danoCrit))
+ 
+        tablaDeNiveles.put(2, new StatsNivel( 93, 46, 10, 23, 132, 0, 45, 225));
+        tablaDeNiveles.put(3, new StatsNivel(106, 58, 12, 26, 145, 0, 51, 252));
+        tablaDeNiveles.put(4, new StatsNivel(119, 71, 14, 29, 158, 0, 58, 281));
+        tablaDeNiveles.put(5, new StatsNivel(132, 85, 16, 32, 172, 0, 66, 312));
     }
-
-    
-    //List<Habilidad> habilidades = new ArrayList<>();
-    //habilidades.add(Habilidades.golpeBrutal());
-    //habilidades.add(Habilidades.escudoDefensivo());
-    //this.setHabilidades(habilidades);
-
+ 
     @Override
     public void subirNivel() {
-        super.subirNivel();
-        this.setAtaque(this.getAtaque() + 8);     // más ataque extra
-        this.setProbCrit(this.getProbCrit() + 3); // más crit extra
+        super.subirNivel(); // aplica la tabla
+        System.out.println("  ¡El Asesino " + getNombre() + " subió de nivel!");
     }
-
-    //public boolean isSigilo() { return sigilo; }
-    //public void setSigilo(boolean sigilo) { this.sigilo = sigilo; }
 }

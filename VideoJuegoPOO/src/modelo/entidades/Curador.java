@@ -1,31 +1,39 @@
 package modelo.entidades;
 
-import java.util.List;
 import modelo.Arma;
 import modelo.Armadura;
 
-public class Curador extends Heroe {
 
+public class Curador extends Heroe {
 
     public Curador(String nombre, Arma arma, Armadura armadura) {
         super(nombre,
-            90, 90,     // vida media-baja
-            10, 12, 14, // ataque bajo, defensa media, velocidad media
-            false,
-            0, 1,
-            80, 80, 80, // mucho mana, sus habilidades lo consumen
-            5, 100,     // casi sin crit
+            90, 90,      // vida, vidaMax
+            10, 12, 14,  // ataque, defensa, velocidad
+            false,       // estaDefendiendo
+            0, 1,        // experiencia, nivel
+            80, 80, 80,  // energiaMax, mana, manaMax
+            5, 100,      // probCrit, danoCrit
             null, arma, armadura);
-    }
 
-    public void curar() {
+        // ── Tabla de niveles del Curador ───────────────────────────────
+        // Formato: tablaDeNiveles.put(nivel,
+        //     new StatsNivel(vidaMax, ataque, defensa, velocidad,
+        //                    energiaMax, manaMax, probCrit, danoCrit))
 
+        tablaDeNiveles.put(2, new StatsNivel(108, 12, 20, 15, 88, 100, 5, 105));
+        tablaDeNiveles.put(3, new StatsNivel(126, 14, 28, 16, 96, 122, 5, 110));
+        tablaDeNiveles.put(4, new StatsNivel(144, 16, 36, 17,104, 146, 6, 115));
+        tablaDeNiveles.put(5, new StatsNivel(162, 18, 44, 18,112, 172, 6, 120));
     }
 
     @Override
     public void subirNivel() {
-        super.subirNivel();
-        this.setManaMax(this.getManaMax() + 15);  // más mana extra
+        super.subirNivel(); // aplica la tabla
+        System.out.println("  ¡El Curador " + getNombre() + " aprende nuevas técnicas de sanación!");
     }
-    
+
+    public void curar() {
+        // TODO: implementar curación a un Heroe objetivo
+    }
 }

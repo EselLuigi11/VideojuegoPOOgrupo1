@@ -6,8 +6,11 @@ import modelo.Arma;
 import modelo.Armadura;
 import modelo.Entidad;
 import modelo.acciones.Habilidad;
-
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 public class Heroe extends Entidad {
 	
@@ -20,26 +23,39 @@ public class Heroe extends Entidad {
 	private int probCrit;
 	private int danoCrit;
 	private List<Habilidad> habilidades;
-	private modelo.Arma arma;
-	private modelo.Armadura armadura;
+	private Arma arma;
+	private Armadura armadura;
+    protected HashMap<Integer, StatsNivel> tablaDeNiveles; //key es el nivel, value es el objeto StatsNivel con las estadísticas para ese nivel
+    //Ejemplo en Guerrero:
+       // *   tablaDeNiveles.put(2, new StatsNivel(200, 28, 50, 8, 110, 0, 5, 150));
+       // A nivel 2 del guerrero se reajustan las estadisticas a vidaMax 200, ataque 28 ... etc 
+
 	
 	
 	
-	public Heroe(String nombre, int vida, int vidaMax, int ataque, int defensa, int velocidad, boolean estaDefendiendo,
-			int experiencia, int nivel, int energia, int energiaMax, int mana, int manaMax, int probCrit, int danoCrit,
+	public Heroe(String nombre, int vida, int vidaMax,
+			int ataque, int defensa,
+			int velocidad, boolean estaDefendiendo,
+			int experiencia, int nivel,
+			int energia, int energiaMax,
+			int mana, int manaMax,
+			int probCrit, int danoCrit,
 			List<Habilidad> habilidades, Arma arma, Armadura armadura) {
+		
 		super(nombre, vida, vidaMax, ataque, defensa, velocidad, estaDefendiendo);
-		this.experiencia = experiencia;
-		this.nivel = nivel;
-		this.energia = energia;
-		this.energiaMax = energiaMax;
-		this.mana = mana;
-		this.manaMax = manaMax;
-		this.probCrit = probCrit;
-		this.danoCrit = danoCrit;
-		this.habilidades = new ArrayList<>();
-		this.arma = arma;
-		this.armadura = armadura;
+		
+        this.experiencia  = experiencia;
+        this.nivel        = nivel;
+        this.energia      = energia;
+        this.energiaMax   = energiaMax;
+        this.mana         = mana;
+        this.manaMax      = manaMax;
+        this.probCrit     = probCrit;
+        this.danoCrit     = danoCrit;
+        this.habilidades  = new ArrayList<>();
+        this.arma         = arma;
+        this.armadura     = armadura;
+        this.tablaDeNiveles = new HashMap<>();
 	}
 
 	public int calcularDanoBase() {
@@ -84,16 +100,36 @@ public class Heroe extends Entidad {
 	}
 	public void subirNivel() {
 		this.nivel++;
-		this.experiencia = 0;
-		 // Al subir de nivel, podrías aumentar las estadísticas del héroe
-		 this.setVidaMax(this.getVidaMax() + 20); // Ejemplo: aumentar
-		 this.setVida(this.getVidaMax()); // Restaurar vida al subir de nivel
-		 this.setAtaque(this.getAtaque() + 5);
-		 this.setDefensa(this.getDefensa() + 5);
-		 this.setManaMax(this.getManaMax() + 10);
-		 this.setMana(this.getManaMax());
-		 this.energiaMax += 10;
-		 this.energia = this.energiaMax;
+        this.experiencia = 0;
+        System.out.println("¡" + this.getNombre() + " subió al nivel " + this.nivel + "!");
+ 
+        StatsNivel statsDelNivel = tablaDeNiveles.get(this.nivel);
+ 
+        if (statsDelNivel != null) {
+            // ── Camino A: stats definidos manualmente en la tabla ──
+            this.setVidaMax(StatsNivel.getVidaMax());
+            this.setAtaque(StatsNivel.getAtaque());
+            this.setDefensa(StatsNivel.getDefensa());
+            this.setVelocidad(StatsNivel.getVelocidad());
+            this.energiaMax = StatsNivel.getEnergiaMax();
+            this.manaMax    = StatsNivel.getManaMax();
+            this.probCrit   = StatsNivel.getProbCrit();
+            this.danoCrit   = StatsNivel.getDanoCrit();
+            System.out.println("  → Stats aplicados desde tabla: " + statsDelNivel);
+        } else {
+            // ── Camino B: incremento genérico de fallback ──
+            // Útil si el jugador llega a un nivel no definido en la tabla.
+            this.setVidaMax(this.getVidaMax() + 20);
+            this.setAtaque(this.getAtaque() + 5);
+            this.setDefensa(this.getDefensa() + 5);
+            this.setManaMax(this.getManaMax() + 10);
+            this.energiaMax += 10;
+            System.out.println("  → Stats aplicados con incremento genérico (nivel no definido en tabla).");
+        }
+        // Al subir de nivel, el héroe recupera toda su vida, mana y energía.
+        this.setVida(this.getVidaMax());
+        this.setMana(this.manaMax);
+        this.energia = this.energiaMax;
 	}
 	
 	
@@ -101,6 +137,22 @@ public class Heroe extends Entidad {
 	
 	
 	
+
+	public int getEnergiaMax() {
+		return energiaMax;
+	}
+
+	public void setEnergiaMax(int energiaMax) {
+		this.energiaMax = energiaMax;
+	}
+
+	public HashMap<Integer, StatsNivel> getTablaDeNiveles() {
+		return tablaDeNiveles;
+	}
+
+	public void setTablaDeNiveles(HashMap<Integer, StatsNivel> tablaDeNiveles) {
+		this.tablaDeNiveles = tablaDeNiveles;
+	}
 
 	// Getters y Setters
 	public int getExperiencia() {

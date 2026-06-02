@@ -1,28 +1,33 @@
 package modelo.entidades;
-
-import java.util.List;
+ 
 import modelo.Arma;
 import modelo.Armadura;
-
+ 
 public class Guerrero extends Heroe {
-
-
+ 
     public Guerrero(String nombre, Arma arma, Armadura armadura) {
         super(nombre,
-            150, 150,   // vida alta
-            20, 25, 8,  // ataque medio, defensa alta, velocidad baja
+            150, 150,   // vida, vidaMax
+            20, 25, 8,  // ataque, defensa, velocidad
             false,
-            0, 1,
-            100, 0, 0,  // sin mana, usa energía
-            5, 150,     // poca prob crit, pero daño crit alto
+            0, 1,       // experiencia, nivel inicial
+            100, 0, 0,  // energia, mana, manaMax
+            5, 150,     // probCrit, danoCrit
             null, arma, armadura);
+ 
+        // ── Tabla de niveles del Guerrero ──────────────────────────
+        // (vidaMax, ataque, defensa, velocidad, energiaMax, manaMax, probCrit, danoCrit)
+        // El Guerrero es un tanque: crece mucho en vida y defensa.
+ 
+        tablaDeNiveles.put(2, new StatsNivel(200, 26, 52, 8,  110, 0, 5, 155));
+        tablaDeNiveles.put(3, new StatsNivel(255, 33, 80, 9,  120, 0, 6, 160));
+        tablaDeNiveles.put(4, new StatsNivel(315, 40, 110, 9, 130, 0, 6, 168));
+        tablaDeNiveles.put(5, new StatsNivel(380, 48, 142, 10,140, 0, 7, 175));
     }
-
+ 
     @Override
     public void subirNivel() {
-        super.subirNivel();
-        this.setVidaMax(this.getVidaMax() + 30);  // más vida extra
-        this.setDefensa(this.getDefensa() + 20);   // más defensa extra
+        super.subirNivel(); 
+        System.out.println("  ¡El Guerrero " + getNombre() + " subió de nivel!");
     }
-
 }

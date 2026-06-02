@@ -97,7 +97,7 @@ public class Party {
         if (inventarioArmas.contains(arma)) {
             // Si el héroe ya tenía un arma, la devuelve al inventario
             if (heroe.getArma() != null) {
-                inventarioArmas.add(modelo.entidades.getArma());
+                inventarioArmas.add(heroe.getArma());
             }
             heroe.setArma(arma);
             inventarioArmas.remove(arma);

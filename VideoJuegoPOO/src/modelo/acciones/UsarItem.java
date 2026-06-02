@@ -22,10 +22,10 @@ public class UsarItem extends Accion {
         Inventario inventario = partida.getInventarioPartida();
         
         if (inventario.contieneItem(item)) {
+        	item.usar(heroe); 
             inventario.eliminarItem(item);
             System.out.println(heroe.getNombre() + " saca " + item.getNombre() + " de la mochila.");
             
-            item.usar(heroe); 
         } else {
             System.out.println("Error: El ítem " + item.getNombre() + " no está en el inventario.");
         }
