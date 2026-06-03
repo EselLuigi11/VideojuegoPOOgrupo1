@@ -92,7 +92,7 @@ public class Party {
     public void eliminarArma(Arma arma) {
         inventarioArmas.remove(arma);
     }
-
+//heroe
     public void equiparArma(Heroe heroe, Arma arma) {
         if (inventarioArmas.contains(arma)) {
             // Si el héroe ya tenía un arma, la devuelve al inventario
@@ -115,7 +115,7 @@ public class Party {
     public void eliminarArmadura(Armadura armadura) {
         inventarioArmaduras.remove(armadura);
     }
-
+//EN CLASE HEROE
     public void equiparArmadura(Heroe heroe, Armadura armadura) {
         if (inventarioArmaduras.contains(armadura)) {
             if (heroe.getArmadura() != null) {
@@ -133,7 +133,7 @@ public class Party {
     public void agregarPocion(Pocion pocion) {
         inventarioPociones.add(pocion);
     }
-
+//USAR POCION DE LA CLASE POCION
     public void usarPocion(Heroe heroe, Pocion pocion) {
         if (inventarioPociones.contains(pocion)) {
             pocion.usar(heroe);

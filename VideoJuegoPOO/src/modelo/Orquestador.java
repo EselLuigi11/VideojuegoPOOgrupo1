@@ -8,7 +8,7 @@ public class Orquestador {
 	// Constructor
 	public Orquestador (Batalla batallaActual, Partida partidaActual) {
 		this.batallaActual = batallaActual;
-		this.contadorTurnos = 1;
+		this.contadorTurnos = 0; //VERIF
 		this.partidaActual = partidaActual;
 	}
 	

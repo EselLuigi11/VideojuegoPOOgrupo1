@@ -5,7 +5,7 @@ import java.util.List;
 
 import modelo.entidades.Heroe;
 
-public class Inventario {
+public class Inventario { 
 	private List<Item> items;
     private int capacidad;
 
@@ -47,7 +47,6 @@ public class Inventario {
     		item.usar(heroe);
     		
     		eliminarItem(item);
-    		
     		
     	}else {
     		System.out.println("No tienes el objeto");
