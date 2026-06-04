@@ -1,5 +1,10 @@
 package modelo;
 
+import java.util.List;
+
+import modelo.entidades.Enemigo;
+import modelo.entidades.Heroe;
+
 public class Orquestador {
 	private Batalla batallaActual;
 	private int contadorTurnos;
@@ -13,7 +18,6 @@ public class Orquestador {
 	}
 	
 	//-------ACTUALIZACIÓN DEL PROCESO DE TURNO-------
-	/*
 	public String procesarTurno(Accion accion) {
 		StringBuilder log = new StringBuilder();
  
@@ -65,8 +69,10 @@ public class Orquestador {
  
 		return log.toString();
 	}
-*/
+
 	//----------ESTO ES LO QUE HIZO ALGUIEN, NECESITO SABER SI CAMBIO LO DE ARRIBA POR ESTO O NO///
+	
+	/*
 	public void procesarSiguienteTurno (Entidad personaje, Accion accionElegida) {
 		if (this.batallaActual.evaluarEstado() != EstadoBatalla.EN_CURSO) {
 			System.out.println("La batalla ya terminó. No se pueden jugar más turnos");
@@ -89,4 +95,5 @@ public class Orquestador {
 	        this.partidaActual.verificarEstadoPartida();
 	    }
 	}
+	*/
 }

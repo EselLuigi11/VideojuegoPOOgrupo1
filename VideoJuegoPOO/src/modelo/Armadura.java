@@ -7,31 +7,31 @@ public class Armadura extends Item {
 	
 	public Armadura(String nombre, String descripcion, int defensa) {
 		super(nombre, descripcion);
-		this.plusdefensa = defensa;
+		this.plusDefensa = defensa;
 		
 	}
 	
 	
 	public void usar(Heroe heroe) {
-		heroe.aumentarDefensa(plusdefensa);
+		heroe.aumentarDefensa(plusDefensa);
 		System.out.println("Armadura equipada");
 		
 	}
 
 
-	public int getDefensa() {
-		return plusdefensa;
+	public int getplusDefensa() {
+		return plusDefensa;
 	}
 
 
-	public void setDefensa(int defensa) {
-		this.defensa = defensa;
+	public void setDefensa(int plusDefensa) {
+		this.plusDefensa = plusDefensa;
 	}
 	
 	
 	public String toString() {
 		return super.toString() + 
 				"| Defensa: " +
-				defensa;
+				plusDefensa;
 	}
 }

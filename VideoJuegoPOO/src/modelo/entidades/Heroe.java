@@ -132,9 +132,30 @@ public class Heroe extends Entidad {
         this.energia = this.energiaMax;
 	}
 	
+	public void equiparArma(Heroe heroe, Arma arma) {
+        if (inventarioArmas.contains(arma)) {
+            // Si el héroe ya tenía un arma, la devuelve al inventario
+            if (heroe.getArma() != null) {
+                inventarioArmas.add(heroe.getArma());
+            }
+            heroe.setArma(arma);
+            inventarioArmas.remove(arma);
+        } else {
+            System.out.println("El arma no está en el inventario.");
+        }
+    }
 	
-	
-	
+	public void equiparArmadura(Heroe heroe, Armadura armadura) {
+        if (inventarioArmaduras.contains(armadura)) {
+            if (heroe.getArmadura() != null) {
+                inventarioArmaduras.add(heroe.getArmadura());
+            }
+            heroe.setArmadura(armadura);
+            inventarioArmaduras.remove(armadura);
+        } else {
+            System.out.println("La armadura no está en el inventario.");
+        }
+    }
 	
 	
 
