@@ -5,7 +5,8 @@ import java.util.List;
 import modelo.Arma;
 import modelo.Armadura;
 import modelo.Entidad;
-import modelo.acciones.Habilidad;
+import modelo.Inventario;
+import modelo.Partida;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +23,6 @@ public class Heroe extends Entidad {
 	private int manaMax;
 	private int probCrit;
 	private int danoCrit;
-	private List<Habilidad> habilidades;
 	private Arma arma;
 	private Armadura armadura;
     protected HashMap<Integer, StatsNivel> tablaDeNiveles; //key es el nivel, value es el objeto StatsNivel con las estadísticas para ese nivel
@@ -40,7 +40,7 @@ public class Heroe extends Entidad {
 			int energia, int energiaMax,
 			int mana, int manaMax,
 			int probCrit, int danoCrit,
-			List<Habilidad> habilidades, Arma arma, Armadura armadura) {
+			Arma arma, Armadura armadura) {
 		
 		super(nombre, vida, vidaMax, ataque, defensa, velocidad, estaDefendiendo);
 		
@@ -52,7 +52,6 @@ public class Heroe extends Entidad {
         this.manaMax      = manaMax;
         this.probCrit     = probCrit;
         this.danoCrit     = danoCrit;
-        this.habilidades  = new ArrayList<>();
         this.arma         = arma;
         this.armadura     = armadura;
         this.tablaDeNiveles = new HashMap<>();
@@ -132,30 +131,41 @@ public class Heroe extends Entidad {
         this.energia = this.energiaMax;
 	}
 	
-	public void equiparArma(Heroe heroe, Arma arma) {
-        if (inventarioArmas.contains(arma)) {
-            // Si el héroe ya tenía un arma, la devuelve al inventario
-            if (heroe.getArma() != null) {
-                inventarioArmas.add(heroe.getArma());
-            }
-            heroe.setArma(arma);
-            inventarioArmas.remove(arma);
-        } else {
-            System.out.println("El arma no está en el inventario.");
-        }
-    }
+	public void equiparArma(Arma arma, Inventario inventario) {
+		// 1. Verificar que el arma esté en la mochila
+		if (!inventario.contieneItem(arma)) {
+			System.out.println("El arma '" + arma.getNombre() + "' no está en la mochila.");
+			return;
+		}
+		// 2. Si ya tenía un arma equipada, la devuelve al inventario
+		if (this.arma != null) {
+			inventario.agregarItem(this.arma);
+			System.out.println(this.getNombre() + " desequipa: " + this.arma.getNombre());
+		}
+		// 3. Equipar el arma nueva y sacarla de la mochila
+		this.arma = arma;
+		inventario.eliminarItem(arma);
+		System.out.println(this.getNombre() + " equipa: " + arma.getNombre());
+	}
+
 	
-	public void equiparArmadura(Heroe heroe, Armadura armadura) {
-        if (inventarioArmaduras.contains(armadura)) {
-            if (heroe.getArmadura() != null) {
-                inventarioArmaduras.add(heroe.getArmadura());
-            }
-            heroe.setArmadura(armadura);
-            inventarioArmaduras.remove(armadura);
-        } else {
-            System.out.println("La armadura no está en el inventario.");
-        }
-    }
+	public void equiparArmadura(Armadura armadura, Inventario inventario) {
+		// 1. Verificar que la armadura esté en la mochila
+		if (!inventario.contieneItem(armadura)) {
+			System.out.println("La armadura '" + armadura.getNombre() + "' no está en la mochila.");
+			return;
+		}
+		// 2. Si ya tenía una armadura equipada, la devuelve al inventario
+		if (this.armadura != null) {
+			inventario.agregarItem(this.armadura);
+			System.out.println(this.getNombre() + " desequipa: " + this.armadura.getNombre());
+		}
+		// 3. Equipar la armadura nueva y sacarla de la mochila
+		this.armadura = armadura;
+		inventario.eliminarItem(armadura);
+		System.out.println(this.getNombre() + " equipa: " + armadura.getNombre());
+	}
+    
 	
 	
 
@@ -232,13 +242,6 @@ public class Heroe extends Entidad {
 		this.danoCrit = danoCrit;
 	}
 
-	public List<Habilidad> getHabilidades() {
-		return habilidades;
-	}
-
-	public void setHabilidades(List<Habilidad> habilidades) {
-		this.habilidades = habilidades;
-	}
 
 	public Arma getArma() {
 		return arma;

@@ -3,7 +3,9 @@ package modelo.entidades;
 import modelo.Arma;
 import modelo.Armadura;
  
-public class Asesino extends Heroe {
+public class Asesino extends Heroe implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
+    private modelo.habilidades.HabEspAsesino habilidadEspecial;
  
     // private boolean sigilo; // activar cuando implementen la habilidad
  
@@ -16,7 +18,7 @@ public class Asesino extends Heroe {
                 120, 120,    // energia, energiaMax
                 0, 0,        // mana, manaMax (el Asesino no usa mana)
                 40, 200,     // probCrit, danoCrit
-                null, arma, armadura);
+                arma, armadura);
  
         // ── Tabla de niveles del Asesino ───────────────────────────────
         // Formato: tablaDeNiveles.put(nivel,

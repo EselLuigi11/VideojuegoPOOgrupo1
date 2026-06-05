@@ -3,7 +3,9 @@ package modelo.entidades;
 import modelo.Arma;
 import modelo.Armadura;
  
-public class Guerrero extends Heroe {
+public class Guerrero extends Heroe implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
+    private modelo.habilidades.HabEspGuerrero habilidadEspecial;
  
     public Guerrero(String nombre, Arma arma, Armadura armadura) {
         super(nombre,
@@ -14,7 +16,7 @@ public class Guerrero extends Heroe {
                 100, 100,   // energia, energiaMax
                 0, 0,       // mana, manaMax (el Guerrero no usa mana)
                 5, 150,     // probCrit, danoCrit
-                null, arma, armadura);
+                arma, armadura);
  
         // ── Tabla de niveles del Guerrero ──────────────────────────
         // (vidaMax, ataque, defensa, velocidad, energiaMax, manaMax, probCrit, danoCrit)

@@ -4,7 +4,9 @@ import modelo.Arma;
 import modelo.Armadura;
 
 
-public class Curador extends Heroe {
+public class Curador extends Heroe implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
+    private modelo.habilidades.HabEspCurador habilidadEspecial;
 
     public Curador(String nombre, Arma arma, Armadura armadura) {
         super(nombre,
@@ -15,7 +17,7 @@ public class Curador extends Heroe {
                 80, 80,      // energia, energiaMax
                 80, 80,      // mana, manaMax
                 5, 100,      // probCrit, danoCrit
-                null, arma, armadura);
+                arma, armadura);
 
         // ── Tabla de niveles del Curador ───────────────────────────────
         // Formato: tablaDeNiveles.put(nivel,

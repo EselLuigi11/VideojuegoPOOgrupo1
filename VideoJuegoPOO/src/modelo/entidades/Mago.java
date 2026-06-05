@@ -2,10 +2,12 @@ package modelo.entidades;
 
 import modelo.Arma;
 import modelo.Armadura;
+import modelo.habilidades.HabEspMago;
 
 public class Mago extends Heroe {
 
     private int poderMagico; // Bonus al daño de habilidades mágicas
+    private modelo.habilidades.HabEspMago habilidadEspecial; // Habilidad exclusiva del Mago
 
     public Mago(String nombre, Arma arma, Armadura armadura) {
         super(nombre,
@@ -16,7 +18,7 @@ public class Mago extends Heroe {
                 60, 60,        // energia, energiaMax
                 120, 120,      // mana, manaMax
                 20, 180,       // probCrit, danoCrit
-                null, arma, armadura);
+                arma, armadura);
             this.poderMagico = 30;
 
         // ── Tabla de niveles del Mago ──────────────────────────────────

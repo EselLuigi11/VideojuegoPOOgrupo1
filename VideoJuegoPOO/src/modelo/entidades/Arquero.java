@@ -14,7 +14,9 @@ import modelo.Armadura;
  *  - Vida:      crece poco (es frágil por diseño)
  *  - Defensa:   crece muy poco (sigue siendo frágil)
  */
-public class Arquero extends Heroe {
+public class Arquero extends Heroe implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
+    private modelo.habilidades.HabEspArquero habilidadEspecial;
  
     public Arquero(String nombre, Arma arma, Armadura armadura) {
         super(nombre,
@@ -25,7 +27,7 @@ public class Arquero extends Heroe {
                 100, 100,    // energia, energiaMax
                 0, 0,        // mana, manaMax (el Arquero no usa mana)
                 30, 160,     // probCrit, danoCrit
-                null, arma, armadura);
+                arma, armadura);
  
        // ── Tabla de niveles del Arquero ───────────────────────────────
  // tablaDeNiveles.put(nivel, new StatsNivel(vidaMax, ataque, defensa, velocidad, energiaMax, manaMax, probCrit, danoCrit))
