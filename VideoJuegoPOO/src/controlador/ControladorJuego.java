@@ -4,18 +4,23 @@ import modelo.Partida;
 import modelo.Orquestador;
 import modelo.vista.VistaMenuPrincipal;
 import modelo.vista.VistaBatalla;
+import modelo.vista.VistaInventario;
 
 public class ControladorJuego {
+	@SuppressWarnings("unused")
 	private Partida partida;
+	@SuppressWarnings("unused")
 	private Orquestador orquestador;
 	private VistaMenuPrincipal vistaMenu;
 	private VistaBatalla vistaBatalla;
+	private VistaInventario vistaInventario;
 	
-	public ControladorJuego(Partida partida, Orquestador orquestador, VistaMenuPrincipal vistaMenu, VistaBatalla vistaBatalla) {
+	public ControladorJuego(Partida partida, Orquestador orquestador, VistaMenuPrincipal vistaMenu, VistaBatalla vistaBatalla, VistaInventario vistaInventario) {
 		this.partida = partida;
 		this.orquestador = orquestador;
 		this.vistaMenu = vistaMenu;
 		this.vistaBatalla = vistaBatalla;
+		this.vistaInventario = vistaInventario;
 	}
 
 	public void iniciar() {
@@ -46,11 +51,9 @@ public class ControladorJuego {
 		
 		// 3. MICRÓFONO PARA "USAR ÍTEM"
 		this.vistaBatalla.getPanelAcciones().getBtnUsarItem().addActionListener(e -> {
-			
 			System.out.println("¡El Héroe quiere USAR UNA POCIÓN!");
-			
-			// Acá en el futuro abrirías el inventario o ejecutarías tu PocionVida.usar(heroe)
-			
+			// Mostramos la vista del inventario
+			this.vistaInventario.setVisible(true);
 		});
 	}
 }
