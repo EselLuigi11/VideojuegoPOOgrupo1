@@ -7,13 +7,14 @@ import javax.swing.JPanel;
 import java.awt.GridLayout;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.util.ArrayList;
 import java.util.List;
 
 public class VistaInventario extends JFrame {
 
     private JPanel panelParty;
     private JPanel panelItems;
-    private ControladorJuego controlador;
+    private List<JButton> botonesUsar;
 
     public VistaInventario() {
         setTitle("Inventario y Equipo");
@@ -21,6 +22,8 @@ public class VistaInventario extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
+        
+        botonesUsar = new ArrayList<>();
 
         panelParty = new JPanel();
         panelParty.setLayout(new GridLayout(0, 1));
@@ -34,26 +37,17 @@ public class VistaInventario extends JFrame {
         add(panelItems, BorderLayout.CENTER);
     }
 
-    public void setControlador(ControladorJuego c) {
-        this.controlador = c;
-    }
-
     public void actualizarInventario(List<String> nombresItems) {
         panelItems.removeAll();
         panelItems.add(new JLabel("--- MOCHILA ---"));
+        botonesUsar.clear();
 
         for (int i = 0; i < nombresItems.size(); i++) {
             JPanel filaItem = new JPanel(new FlowLayout(FlowLayout.LEFT));
             JLabel lblNombre = new JLabel("- " + nombresItems.get(i));
             JButton btnUsar = new JButton("Usar");
             
-            final int indice = i;
-            
-            btnUsar.addActionListener(e -> {
-                if (controlador != null) {
-                    controlador.usarPocion(indice);
-                }
-            });
+            botonesUsar.add(btnUsar);
 
             filaItem.add(lblNombre);
             filaItem.add(btnUsar);
@@ -62,5 +56,9 @@ public class VistaInventario extends JFrame {
         
         panelItems.revalidate();
         panelItems.repaint();
+    }
+
+    public List<JButton> getBotonesUsar() {
+        return botonesUsar;
     }
 }
