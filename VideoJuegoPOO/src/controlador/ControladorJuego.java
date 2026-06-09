@@ -61,9 +61,42 @@ public class ControladorJuego {
 				System.out.println(logBatalla);
 
 				// Actualizamos barras visuales (asegurate de tener getVidaMax() configurado en las entidades)
-				this.vistaBatalla.getPanelEstado().getPanelGuerrero().actualizarBarraVisual(heroeActivo.getVida(), heroeActivo.getVidaMax());
-				this.vistaBatalla.getPanelEstado().getPanelEnemigo().actualizarBarraVisual(enemigoObjetivo.getVida(), enemigoObjetivo.getVidaMax());
+				// Actualizar héroe activo
+				this.vistaBatalla.getPanelEstado().getPanelGuerrero()
+				    .actualizarBarraVisual(
+				        heroeActivo.getVida(),
+				        heroeActivo.getVidaMax());
 
+				// Actualizar enemigos
+				if (orquestador.getEnemigosVivos().size() > 0) {
+				    Enemigo enemigo1 = orquestador.getEnemigosVivos().get(0);
+
+				    this.vistaBatalla.getPanelEstado()
+				        .getPanelEnemigo1()
+				        .actualizarBarraVisual(
+				            enemigo1.getVida(),
+				            enemigo1.getVidaMax());
+				}
+
+				if (orquestador.getEnemigosVivos().size() > 1) {
+				    Enemigo enemigo2 = orquestador.getEnemigosVivos().get(1);
+
+				    this.vistaBatalla.getPanelEstado()
+				        .getPanelEnemigo2()
+				        .actualizarBarraVisual(
+				            enemigo2.getVida(),
+				            enemigo2.getVidaMax());
+				}
+
+				if (orquestador.getEnemigosVivos().size() > 2) {
+				    Enemigo enemigo3 = orquestador.getEnemigosVivos().get(2);
+
+				    this.vistaBatalla.getPanelEstado()
+				        .getPanelEnemigo3()
+				        .actualizarBarraVisual(
+				            enemigo3.getVida(),
+				            enemigo3.getVidaMax());
+				}
 				if (!enemigoObjetivo.estaVivo()) {
 					JOptionPane.showMessageDialog(vistaBatalla, "¡Enemigo derrotado!", "Victoria", JOptionPane.INFORMATION_MESSAGE);
 				}
