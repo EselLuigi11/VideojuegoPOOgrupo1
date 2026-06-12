@@ -1,7 +1,7 @@
 package controlador;
 
 import javax.swing.JOptionPane;
-
+import modelo.vista.PanelPersonaje;
 import java.util.ArrayList;
 import java.util.List;
 import modelo.Partida;
@@ -121,7 +121,19 @@ public class ControladorJuego {
 						.findFirst()
 						.orElse(enemigosVivos.get(0));
 
+
+				/*Hace que se activen las animaciones*/
+				PanelPersonaje panelAtacante =
+				        vistaBatalla.getPanelEstado()
+				                    .buscarPanelHeroe(heroeActivo);
+
+				if (panelAtacante != null) {
+				    panelAtacante.mostrarAtaque();
+				}
+				
+				
 				// Ejecución del turno
+				
 				Atacar ataque = new Atacar(heroeActivo, enemigoObjetivo);
 				String logBatalla = orquestador.procesarTurno(ataque);
 				this.vistaBatalla.appendHistorial(logBatalla);
