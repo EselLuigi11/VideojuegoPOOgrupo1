@@ -4,17 +4,17 @@ import modelo.Pocion;
 import modelo.entidades.Heroe;
 
 public class PocionEnergia extends Pocion {
-	private int energiaRecuperada;
-	
-	public PocionEnergia(String nombre, String descripcion, int energiaRecuperada) {
+	private int manaRecuperado;
+
+	public PocionEnergia(String nombre, String descripcion, int manaRecuperado) {
 		super(nombre, descripcion);
-		this.energiaRecuperada = energiaRecuperada;
+		this.manaRecuperado = manaRecuperado;
 	}
-	
+
 	@Override
 	public void usar(Heroe heroe) {
 		System.out.println("Usando " + this.getNombre() + " en " + heroe.getNombre());
-		heroe.recuperarEnergia(energiaRecuperada);
-		System.out.println("¡" + heroe.getNombre() + " ha recuperado " + this.energiaRecuperada + " puntos de energía!");
+		heroe.recuperarMana(manaRecuperado);
+		System.out.println("¡" + heroe.getNombre() + " ha recuperado " + this.manaRecuperado + " puntos de maná!");
 	}
 }

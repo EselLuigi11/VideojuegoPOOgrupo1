@@ -27,58 +27,48 @@ public class Enemigo extends Entidad {
 	// Método para que el enemigo ataque al héroe
 	// Se puede dividir en 2, funcion A que devuelva el heroe al que ataca el enemigo seg tipo. 
 	// Y funcion B que ejecute el ataque al heroe objetivo que devuelve la funcion A.
-	public void EnemigoAtaca(List<Heroe> heroes) {
-	    if (heroes == null || heroes.isEmpty()) return;
+	public String EnemigoAtaca(List<Heroe> heroes) {
+	    if (heroes == null || heroes.isEmpty()) return "";
 	    Heroe objetivo = null;
 	    Random rand = new Random();
 	    switch (this.tipo) {
 	        case GOBLIN:
 	        case BRUJO:
-	            // Ataca a un héroe random
 	            objetivo = heroes.get(rand.nextInt(heroes.size()));
 	            break;
 	        case LADRON:
-	            // Ataca al primero de la lista (orden de aparición)
 	            objetivo = heroes.get(0);
 	            break;
 	        case GOLEM:
-	            // Ataca al héroe con más vida (el "tanque")
 	            objetivo = heroes.get(0);
 	            for (Heroe h : heroes) {
-	                if (h.getVida() > objetivo.getVida()) {
-	                    objetivo = h;
-	                }
+	                if (h.getVida() > objetivo.getVida()) objetivo = h;
 	            }
 	            break;
 	        case DRAGON:
-	            // Busca si hay un Curador en el equipo
 	            Heroe curador = null;
 	            for (Heroe h : heroes) {
-	                if (h instanceof Curador) {
-	                    curador = h;
-	                    break;
-	                }
+	                if (h instanceof Curador) { curador = h; break; }
 	            }
 	            if (curador == null) {
-	                // No hay curador, ataca random
 	                objetivo = heroes.get(rand.nextInt(heroes.size()));
 	            } else {
-	                // Busca si hay alguien con MENOS vida que el curador
 	                Heroe masDebil = curador;
 	                for (Heroe h : heroes) {
-	                    if (h.getVida() < masDebil.getVida()) {
-	                        masDebil = h;
-	                    }
+	                    if (h.getVida() < masDebil.getVida()) masDebil = h;
 	                }
-	                // Si masDebil sigue siendo el curador, no había nadie con menos vida
 	                objetivo = masDebil;
 	            }
 	            break;
 	    }
 
 	    if (objetivo != null) {
+	        int vidaAntes = objetivo.getVida();
 	        objetivo.recibirDano(this.getAtaque());
+	        int danoReal = vidaAntes - objetivo.getVida();
+	        return this.getNombre() + " ataca a " + objetivo.getNombre() + " por " + danoReal + " de daño.";
 	    }
+	    return this.getNombre() + " no encontró objetivo.";
 	}
 
 	

@@ -7,19 +7,20 @@ public class PanelAcciones extends JPanel {
 
     private JButton btnAtacar;
     private JButton btnDefender;
+    private JButton btnHabilidad;
     private JButton btnUsarItem;
     private JButton btnGuardarPartida;
 
     public PanelAcciones() {
-
         btnAtacar = new JButton("Atacar");
         btnDefender = new JButton("Defender");
+        btnHabilidad = new JButton("Habilidad");
         btnUsarItem = new JButton("Usar Ítem");
+        btnGuardarPartida = new JButton("Guardar Partida");
 
         add(btnAtacar);
         add(btnDefender);
-        btnGuardarPartida = new JButton("Guardar Partida");
-
+        add(btnHabilidad);
         add(btnUsarItem);
         add(btnGuardarPartida);
     }
@@ -30,6 +31,10 @@ public class PanelAcciones extends JPanel {
 
     public JButton getBtnDefender() {
         return btnDefender;
+    }
+
+    public JButton getBtnHabilidad() {
+        return btnHabilidad;
     }
 
     public JButton getBtnUsarItem() {

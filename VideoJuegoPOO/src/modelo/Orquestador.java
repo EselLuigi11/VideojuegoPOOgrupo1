@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import modelo.pociones.PocionMana;
-import modelo.pociones.PocionVida;
 import modelo.acciones.Atacar;
 import modelo.acciones.Defender;
 import modelo.acciones.UsarItem;
@@ -16,6 +14,11 @@ import modelo.entidades.Enemigo;
 import modelo.entidades.Guerrero;
 import modelo.entidades.Heroe;
 import modelo.entidades.Mago;
+import modelo.habilidades.HabEspArquero;
+import modelo.habilidades.HabEspAsesino;
+import modelo.habilidades.HabEspCurador;
+import modelo.habilidades.HabEspGuerrero;
+import modelo.habilidades.HabEspMago;
 
 public class Orquestador {
 	private Batalla batallaActual;
@@ -91,34 +94,6 @@ public class Orquestador {
 		return "Comienza la batalla " + numeroBatalla + ".";
 	}
 
-	public List<Heroe> getHeroesVivos() {
-		List<Heroe> heroesVivos = new ArrayList<>();
-		if (batallaActual == null) {
-			return heroesVivos;
-		}
-
-		for (Heroe heroe : batallaActual.getHeroes()) {
-			if (heroe != null && heroe.estaVivo()) {
-				heroesVivos.add(heroe);
-			}
-		}
-		return heroesVivos;
-	}
-
-	public List<Enemigo> getEnemigosVivos() {
-		List<Enemigo> enemigosVivos = new ArrayList<>();
-		if (batallaActual == null) {
-			return enemigosVivos;
-		}
-
-		for (Enemigo enemigo : batallaActual.getEnemigos()) {
-			if (enemigo != null && enemigo.estaVivo()) {
-				enemigosVivos.add(enemigo);
-			}
-		}
-		return enemigosVivos;
-	}
-
 	public Entidad getPersonajeActual() {
 		actualizarOrdenTurnos();
 
@@ -173,6 +148,74 @@ public class Orquestador {
 		return new UsarItem(partidaActual, heroe, item);
 	}
 		
+	public String procesarHabilidad(Heroe heroeQueActua, Enemigo objetivo) {
+		StringBuilder log = new StringBuilder();
+
+		if (batallaActual == null) {
+			return "No hay una batalla activa.";
+		}
+
+		if (batallaActual.evaluarEstado() != EstadoBatalla.EN_CURSO) {
+			return resolverFinDeBatalla(log);
+		}
+
+		actualizarOrdenTurnos();
+		if (ordenTurnos.isEmpty()) {
+			return resolverFinDeBatalla(log);
+		}
+
+		procesarTurnosAutomaticosEnemigos(log);
+
+		if (batallaActual.evaluarEstado() != EstadoBatalla.EN_CURSO) {
+			return log.toString();
+		}
+
+		Entidad personajeActual = getPersonajeActual();
+		if (!(personajeActual instanceof Heroe)) {
+			return log.toString();
+		}
+
+		if (heroeQueActua != null && heroeQueActua != personajeActual) {
+			return "No es el turno de " + heroeQueActua.getNombre()
+					+ ". Es el turno de " + personajeActual.getNombre() + ".";
+		}
+
+		Heroe heroe = (Heroe) personajeActual;
+		log.append("-- Turno ").append(contadorTurnos)
+				.append(": ").append(heroe.getNombre()).append(" --\n");
+		heroe.setEstaDefendiendo(false);
+
+		String resultadoHab = ejecutarHabilidadStr(heroe, objetivo);
+		log.append(resultadoHab).append("\n");
+		contadorTurnos++;
+
+		avanzarTurnoDesde(heroe);
+		procesarTurnosAutomaticosEnemigos(log);
+		resolverFinDeBatalla(log);
+
+		return log.toString();
+	}
+
+	private String ejecutarHabilidadStr(Heroe heroe, Enemigo objetivo) {
+		if (heroe instanceof Guerrero) {
+			HabEspGuerrero hab = ((Guerrero) heroe).getHabilidadEspecial();
+			return hab.ejecutar((Guerrero) heroe, objetivo);
+		} else if (heroe instanceof Arquero) {
+			HabEspArquero hab = ((Arquero) heroe).getHabilidadEspecial();
+			return hab.ejecutar((Arquero) heroe, objetivo);
+		} else if (heroe instanceof Asesino) {
+			HabEspAsesino hab = ((Asesino) heroe).getHabilidadEspecial();
+			return hab.ejecutar((Asesino) heroe, objetivo);
+		} else if (heroe instanceof Mago) {
+			HabEspMago hab = ((Mago) heroe).getHabilidadEspecial();
+			return hab.ejecutar((Mago) heroe, batallaActual.getEnemigosVivos());
+		} else if (heroe instanceof Curador) {
+			HabEspCurador hab = ((Curador) heroe).getHabilidadEspecial();
+			return hab.ejecutar((Curador) heroe, batallaActual.getHeroesVivos());
+		}
+		return heroe.getNombre() + " no tiene habilidad especial.";
+	}
+
 	// Procesa el siguiente turno respetando el orden global por velocidad.
 	public String procesarTurno(Accion accion) {
 		return procesarTurno(null, accion);
@@ -232,7 +275,7 @@ public class Orquestador {
 
 		heroe.setEstaDefendiendo(false);
 		accion.ejecutar();
-		log.append("[Accion de ").append(heroe.getNombre()).append(" ejecutada]\n");
+		log.append(accion.getMensajeEjecucion()).append("\n\n");
 		contadorTurnos++;
 
 		avanzarTurnoDesde(heroe);
@@ -258,14 +301,13 @@ public class Orquestador {
 	        Enemigo enemigo = (Enemigo) getPersonajeActual();
 
 	        if (enemigo != null && enemigo.estaVivo()) {
-	            List<Heroe> heroesVivos = getHeroesVivos();
+	            List<Heroe> heroesVivos = batallaActual.getHeroesVivos();
 	            if (!heroesVivos.isEmpty()) {
 	                log.append("-- Turno ").append(contadorTurnos)
 	                        .append(": ").append(enemigo.getNombre()).append(" --\n");
 
-	                enemigo.EnemigoAtaca(heroesVivos);  // IA del enemigo — ataca a 1 héroe
-
-	                log.append(enemigo.getNombre()).append(" ataca.\n");
+	                String mensajeAtaque = enemigo.EnemigoAtaca(heroesVivos);
+	                log.append(mensajeAtaque).append("\n\n");
 	                contadorTurnos++;
 	            }
 	        }
@@ -364,10 +406,10 @@ public class Orquestador {
 	}
 
 	private void repartirExperiencia() {
-		List<Heroe> heroesVivos = getHeroesVivos();
-		if (heroesVivos.isEmpty() || batallaActual == null) {
-			return;
-		}
+		if (batallaActual == null) return;
+
+		List<Heroe> heroesVivos = batallaActual.getHeroesVivos();
+		if (heroesVivos.isEmpty()) return;
 
 		for (Enemigo enemigo : batallaActual.getEnemigos()) {
 			if (enemigo != null) {
@@ -377,60 +419,8 @@ public class Orquestador {
 			}
 		}
 
-		otorgarRecompensas(numeroBatallaActual);
-	}
-
-	private void otorgarRecompensas(int numeroBatalla) {
-		if (partidaActual == null) {
-			return;
-		}
-
-		Inventario inv = partidaActual.getInventarioPartida();
-		List<Heroe> vivos = getHeroesVivos();
-
-		System.out.println("=== Recompensas de la batalla " + numeroBatalla + " ===");
-
-		switch (numeroBatalla) {
-			case 1:
-				for (Heroe h : vivos) {
-					Arma arma = null;
-					if (h instanceof Guerrero) {
-						arma = new Arma("Espada de Hierro", "Espada de un goblin derrotado.", 8);
-					} else if (h instanceof Arquero) {
-						arma = new Arma("Arco Corto", "Arco {Ágil del campo de batalla.", 7);
-					} else if (h instanceof Asesino) {
-						arma = new Arma("Daga Envenenada", "Daga con filo goblin.", 9);
-					} else if (h instanceof Mago) {
-						arma = new Arma("Bastón de Rama", "Canal arcano primitivo.", 5);
-					} else if (h instanceof Curador) {
-						arma = new Arma("Vara Sagrada", "Emana energí­a curativa.", 4);
-					} else {
-						arma = new Arma("Arma Simple", "Botín básico.", 6);
-					}
-					h.setArma(arma);
-					System.out.println(h.getNombre() + " equipó: " + arma.getNombre());
-				}
-				inv.agregarItem(new PocionVida("Poción de Vida", "Restaura 50 HP.", 50));
-				inv.agregarItem(new PocionVida("Poción de Vida", "Restaura 50 HP.", 50));
-				break;
-
-			case 2:
-				inv.agregarItem(new PocionVida("Poción de Vida Mayor", "Restaura 80 HP.", 80));
-				inv.agregarItem(new PocionVida("Poción de Vida Mayor", "Restaura 80 HP.", 80));
-				inv.agregarItem(new PocionMana("Poción de Maná", "Restaura 40 MP.", 40));
-				inv.agregarItem(new Arma("Espada Reforzada", "Hoja de ladrón veterano.", 12));
-				break;
-
-			case 3:
-				inv.agregarItem(new PocionVida("Elixir de Vida", "Restaura 120 HP.", 120));
-				inv.agregarItem(new PocionVida("Elixir de Vida", "Restaura 120 HP.", 120));
-				inv.agregarItem(new Arma("Báculo del Gólem", "Forjado del núcleo del gólem.", 18));
-				inv.agregarItem(new Armadura("Loriga de Piedra", "Alta defensa del gólem.", 20));
-				break;
-
-			default:
-				inv.agregarItem(new PocionVida("Poción de Vida", "Restaura 50 HP.", 50));
-				break;
+		if (partidaActual != null) {
+			batallaActual.otorgarRecompensas(partidaActual.getInventarioPartida(), numeroBatallaActual);
 		}
 	}
 }

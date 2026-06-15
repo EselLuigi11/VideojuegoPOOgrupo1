@@ -5,47 +5,31 @@ import javax.swing.*;
 import modelo.Entidad;
 import modelo.entidades.Heroe;
 
-/**
- * Panel que representa visualmente a UNA entidad (Héroe o Enemigo) en combate.
- *
- * CAMBIOS vs versión anterior:
- *  - Ya NO recibe un String hardcodeado. Recibe una Entidad real del modelo.
- *  - Expone refresh() para que el Controlador sincronice la UI con el modelo
- *    en un único punto (actualizarInterfazGrafica).
- *  - Barra de maná visible solo para Héroes.
- *  - Color de alerta cuando HP < 30%.
- */
 public class PanelPersonaje extends JPanel {
 
-    // ── Referencia al modelo ──────────────────────────────────────────────────
     private final Entidad entidad;
 
-    // ── Componentes de vista ──────────────────────────────────────────────────
     private final JLabel        lblNombre;
     private final JProgressBar  barraVida;
-    private final JProgressBar  barraMana;   // null para Enemigos
+    private final JProgressBar  barraMana;
+    private final JProgressBar  barraExp;
     private final JLabel        lblVidaTexto;
-    private final JLabel        lblManaTexto; // null para Enemigos
+    private final JLabel        lblManaTexto;
+    private final JLabel        lblExpTexto;
     private final JLabel        lblImagen;
-    private ImageIcon spriteIdle; /*ambas agregadas con animaciones*/
+    private ImageIcon spriteIdle;
     private ImageIcon spriteAtaque;
 
-    // ── Paleta ────────────────────────────────────────────────────────────────
-    private static final Color COLOR_VIDA_OK    = new Color(50, 200, 70);
-    private static final Color COLOR_VIDA_BAJA  = new Color(220, 50, 50);
-    private static final Color COLOR_MANA       = new Color(60, 120, 220);
-    private static final Color COLOR_BG         = new Color(15, 15, 30, 210);
-    private static final Color COLOR_BORDE      = new Color(90, 90, 150);
-    private static final Color COLOR_ACTIVO     = new Color(255, 215, 0); // Dorado para el turno activo
-    private static final Font  FUENTE_NOMBRE    = new Font("Serif",      Font.BOLD,  13);
-    private static final Font  FUENTE_STATS     = new Font("Monospaced", Font.PLAIN, 10);
+    private static final Color COLOR_VIDA_OK   = new Color(50, 200, 70);
+    private static final Color COLOR_VIDA_BAJA = new Color(220, 50, 50);
+    private static final Color COLOR_MANA      = new Color(60, 120, 220);
+    private static final Color COLOR_EXP       = new Color(140, 70, 210); // Color púrpura para XP
+    private static final Color COLOR_BG        = new Color(15, 15, 30, 210);
+    private static final Color COLOR_BORDE     = new Color(90, 90, 150);
+    private static final Color COLOR_ACTIVO    = new Color(255, 215, 0);
+    private static final Font  FUENTE_NOMBRE   = new Font("Serif",      Font.BOLD,  13);
+    private static final Font  FUENTE_STATS    = new Font("Monospaced", Font.PLAIN, 10);
 
-    // ─────────────────────────────────────────────────────────────────────────
-
-    /**
-     * @param entidad  La entidad del modelo que este panel representa.
-     *                 No puede ser null.
-     */
     public PanelPersonaje(Entidad entidad) {
         if (entidad == null) throw new IllegalArgumentException("Entidad no puede ser nula.");
         this.entidad = entidad;
@@ -57,7 +41,7 @@ public class PanelPersonaje extends JPanel {
             BorderFactory.createLineBorder(COLOR_BORDE, 1, true),
             BorderFactory.createEmptyBorder(4, 8, 4, 8)
         ));
-        setPreferredSize(new Dimension(170, esHeroe() ? 155 : 130));
+        setPreferredSize(new Dimension(170, esHeroe() ? 180 : 130)); // Aumentamos el alto para la barra de XP
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets    = new Insets(2, 2, 2, 2);
@@ -65,19 +49,19 @@ public class PanelPersonaje extends JPanel {
         gbc.gridwidth = 2;
         gbc.weightx   = 1.0;
 
-        // ── Fila 0: sprite ────────────────────────────────────────────────────
+        // Fila 0: sprite
         lblImagen = cargarSprite(entidad.getNombre());
         gbc.gridx = 0; gbc.gridy = 0;
         add(lblImagen, gbc);
 
-        // ── Fila 1: nombre ────────────────────────────────────────────────────
+        // Fila 1: nombre
         lblNombre = new JLabel(entidad.getNombre(), SwingConstants.CENTER);
         lblNombre.setFont(FUENTE_NOMBRE);
         lblNombre.setForeground(Color.WHITE);
         gbc.gridy = 1;
         add(lblNombre, gbc);
 
-        // ── Fila 2: barra de vida ─────────────────────────────────────────────
+        // Fila 2-3: barra de vida
         barraVida = crearBarra(entidad.getVidaMax(), COLOR_VIDA_OK);
         gbc.gridy = 2;
         add(barraVida, gbc);
@@ -86,28 +70,29 @@ public class PanelPersonaje extends JPanel {
         gbc.gridy = 3;
         add(lblVidaTexto, gbc);
 
-        // ── Filas 4-5: maná (solo Héroes) ─────────────────────────────────────
+        // Filas 4-5: maná (solo héroes)
         if (esHeroe()) {
             Heroe h = (Heroe) entidad;
             barraMana    = crearBarra(Math.max(h.getManaMax(), 1), COLOR_MANA);
             lblManaTexto = crearLabelStat();
             gbc.gridy = 4; add(barraMana,    gbc);
             gbc.gridy = 5; add(lblManaTexto, gbc);
+
+            // Filas 6-7: experiencia y nivel
+            barraExp    = crearBarra(h.getNivel() * 105, COLOR_EXP);
+            lblExpTexto = crearLabelStat();
+            gbc.gridy = 6; add(barraExp,    gbc);
+            gbc.gridy = 7; add(lblExpTexto, gbc);
         } else {
             barraMana    = null;
             lblManaTexto = null;
+            barraExp     = null;
+            lblExpTexto  = null;
         }
 
-        // Primera sincronización
         refresh();
     }
 
-    // ── API pública ───────────────────────────────────────────────────────────
-
-    /**
-     * Sincroniza TODOS los componentes visuales con el estado actual de la Entidad.
-     * El Controlador llama a este método desde actualizarInterfazGrafica().
-     */
     public void refresh() {
         int vida    = entidad.getVida();
         int vidaMax = entidad.getVidaMax();
@@ -126,19 +111,21 @@ public class PanelPersonaje extends JPanel {
             barraMana.setMaximum(manaM);
             barraMana.setValue(Math.max(0, mana));
             lblManaTexto.setText("MP " + mana + "/" + manaM);
+
+            // Actualizamos barra de XP y texto de Nivel
+            int expMax = h.getNivel() * 105;
+            barraExp.setMaximum(expMax);
+            barraExp.setValue(Math.max(0, h.getExperiencia()));
+            lblExpTexto.setText("LVL " + h.getNivel() + " | XP " + h.getExperiencia() + "/" + expMax);
         }
 
-        // Tachar el nombre si cayó en combate
         boolean muerto = vida <= 0;
         lblNombre.setText(muerto
             ? "<html><s>" + entidad.getNombre() + "</s></html>"
             : entidad.getNombre());
     }
 
-    /** Devuelve la entidad del modelo asociada a este panel. */
     public Entidad getEntidad() { return entidad; }
-
-    // ── Helpers privados ──────────────────────────────────────────────────────
 
     private boolean esHeroe() { return entidad instanceof Heroe; }
 
@@ -159,79 +146,51 @@ public class PanelPersonaje extends JPanel {
         return lbl;
     }
 
-    /**
-     * Intenta cargar /img/<nombre_en_minúsculas>.png.
-     * Si no existe, muestra un placeholder de texto para no romper la UI.
-     */
-    private JLabel cargarSprite(String nombre) { /*cambiado todo para agregar animaciones*/
+    private JLabel cargarSprite(String nombre) {
         JLabel lbl = new JLabel();
         lbl.setHorizontalAlignment(SwingConstants.CENTER);
-        
-        System.out.println("CARPETA IMG = "
-                + getClass().getResource("/img/"));
+
+        System.out.println("CARPETA IMG = " + getClass().getResource("/img/"));
 
         try {
             String base = nombre.toLowerCase().replace(" ", "_");
 
-            java.net.URL idleURL =
-                    getClass().getResource("/img/" + base + "_idle.png");
+            java.net.URL idleURL   = getClass().getResource("/img/" + base + "_idle.png");
+            java.net.URL ataqueURL = getClass().getResource("/img/" + base + "_ataque.png");
 
-            java.net.URL ataqueURL =
-                    getClass().getResource("/img/" + base + "_ataque.png");
-            
             System.out.println("Entidad: " + nombre);
-            System.out.println("Buscando idle: /img/" + base + "_idle.png");
-            System.out.println("Buscando ataque: /img/" + base + "_ataque.png");
-            System.out.println("idleURL = " + idleURL);
-            System.out.println("ataqueURL = " + ataqueURL);
+            System.out.println("Buscando idle: /img/" + base + "_idle.png -> " + idleURL);
+            System.out.println("Buscando ataque: /img/" + base + "_ataque.png -> " + ataqueURL);
 
             if (idleURL != null) {
-
                 Image idleImg = new ImageIcon(idleURL)
-                        .getImage()
-                        .getScaledInstance(100, 100, Image.SCALE_SMOOTH);
-
+                        .getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
                 spriteIdle = new ImageIcon(idleImg);
-
                 lbl.setIcon(spriteIdle);
 
                 if (ataqueURL != null) {
                     Image atkImg = new ImageIcon(ataqueURL)
-                            .getImage()
-                            .getScaledInstance(100, 100, Image.SCALE_SMOOTH);
-
+                            .getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
                     spriteAtaque = new ImageIcon(atkImg);
                 }
             } else {
                 lbl.setText("[" + nombre.charAt(0) + "]");
             }
-
         } catch (Exception e) {
             lbl.setText("[?]");
         }
 
         return lbl;
     }
-    
-    public void mostrarAtaque() { /*agregado con las animaciones*/
 
-        if (spriteAtaque == null)
-            return;
-
+    public void mostrarAtaque() {
+        if (spriteAtaque == null) return;
         lblImagen.setIcon(spriteAtaque);
-
-        javax.swing.Timer timer =
-                new javax.swing.Timer(400, e -> {
-                    lblImagen.setIcon(spriteIdle);
-                });
-
+        javax.swing.Timer timer = new javax.swing.Timer(400, e -> lblImagen.setIcon(spriteIdle));
         timer.setRepeats(false);
         timer.start();
     }
 
-    /**
-     * Resalta visualmente el panel si la entidad es la que tiene el turno actual.
-     */
     public void setActivo(boolean activo) {
         if (activo) {
             setBorder(BorderFactory.createCompoundBorder(

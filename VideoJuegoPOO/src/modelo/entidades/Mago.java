@@ -16,22 +16,17 @@ public class Mago extends Heroe {
                 15, 8, 16,     // ataque, defensa, velocidad
                 false,
                 0, 1,          // experiencia, nivel
-                60, 60,        // energia, energiaMax
                 120, 120,      // mana, manaMax
                 20, 180,       // probCrit, danoCrit
                 arma, armadura);
             this.poderMagico = 30;
             this.habilidadEspecial = new HabEspMago();
 
-        // ── Tabla de niveles del Mago ──────────────────────────────────
-        // Formato: tablaDeNiveles.put(nivel,
-        //     new StatsNivel(vidaMax, ataque, defensa, velocidad,
-        //                    energiaMax, manaMax, probCrit, danoCrit))
-
-        tablaDeNiveles.put(2, new StatsNivel( 85, 17, 10, 17,  65, 140, 22, 200));
-        tablaDeNiveles.put(3, new StatsNivel( 95, 19, 12, 18,  70, 162, 24, 222));
-        tablaDeNiveles.put(4, new StatsNivel(105, 21, 14, 19,  75, 186, 26, 246));
-        tablaDeNiveles.put(5, new StatsNivel(115, 23, 16, 20,  80, 212, 28, 272));
+        // (vidaMax, ataque, defensa, velocidad, manaMax, probCrit, danoCrit)
+        tablaDeNiveles.put(2, new StatsNivel( 85, 17, 10, 17, 140, 22, 200));
+        tablaDeNiveles.put(3, new StatsNivel( 95, 19, 12, 18, 162, 24, 222));
+        tablaDeNiveles.put(4, new StatsNivel(105, 21, 14, 19, 186, 26, 246));
+        tablaDeNiveles.put(5, new StatsNivel(115, 23, 16, 20, 212, 28, 272));
     }
 
     public HabEspMago getHabilidadEspecial() {

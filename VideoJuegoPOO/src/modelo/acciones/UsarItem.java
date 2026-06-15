@@ -8,8 +8,9 @@ import modelo.entidades.Heroe;
 
 public class UsarItem extends Accion {
     private Partida partida;
-    private Heroe heroe; 
+    private Heroe heroe;
     private Item item;
+    private String mensajeEjecucion = "";
 
     public UsarItem(Partida partida, Heroe heroe, Item item) {
         this.partida = partida;
@@ -20,24 +21,28 @@ public class UsarItem extends Accion {
     @Override
     public void ejecutar() {
         if (partida == null || heroe == null || item == null) {
-            System.out.println("No se puede usar el ítem porque faltan datos.");
+            mensajeEjecucion = "No se puede usar el ítem porque faltan datos.";
             return;
         }
 
         if (!heroe.estaVivo()) {
-            System.out.println(heroe.getNombre() + " no puede usar ítems porque está fuera de combate.");
+            mensajeEjecucion = heroe.getNombre() + " no puede usar ítems porque está fuera de combate.";
             return;
         }
 
         Inventario inventario = partida.getInventarioPartida();
-        
+
         if (inventario.contieneItem(item)) {
-        	item.usar(heroe); 
+            item.usar(heroe);
             inventario.eliminarItem(item);
-            System.out.println(heroe.getNombre() + " saca " + item.getNombre() + " de la mochila.");
-            
+            mensajeEjecucion = heroe.getNombre() + " usa " + item.getNombre() + ".";
         } else {
-            System.out.println("Error: El ítem " + item.getNombre() + " no está en el inventario.");
+            mensajeEjecucion = "El ítem " + item.getNombre() + " no está en el inventario.";
         }
+    }
+
+    @Override
+    public String getMensajeEjecucion() {
+        return mensajeEjecucion;
     }
 }

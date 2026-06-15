@@ -7,6 +7,7 @@ import modelo.entidades.Heroe;
 public class Atacar extends Accion {
     private Entidad atacante;
     private Entidad objetivo;
+    private String mensajeEjecucion = "";
 
     public Atacar(Entidad atacante, Entidad objetivo) {
         this.atacante = atacante;
@@ -16,23 +17,27 @@ public class Atacar extends Accion {
     @Override
     public void ejecutar() {
         if (atacante == null || objetivo == null) {
-            System.out.println("No se puede atacar sin atacante u objetivo.");
+            mensajeEjecucion = "No se puede atacar sin atacante u objetivo.";
             return;
         }
 
         if (!atacante.estaVivo()) {
-            System.out.println(atacante.getNombre() + " no puede atacar porque está fuera de combate.");
+            mensajeEjecucion = atacante.getNombre() + " no puede atacar porque está fuera de combate.";
             return;
         }
 
         if (!objetivo.estaVivo()) {
-            System.out.println(objetivo.getNombre() + " ya está derrotado.");
+            mensajeEjecucion = objetivo.getNombre() + " ya está derrotado.";
             return;
         }
 
         int danoTotal = calcularDanoTotal();
-        System.out.println(atacante.getNombre() + " ataca a " + objetivo.getNombre() + " por " + danoTotal + " de daño.");
+        mensajeEjecucion = atacante.getNombre() + " ataca a " + objetivo.getNombre() + " por " + danoTotal + " de daño.";
         objetivo.recibirDano(danoTotal); 
+    }
+
+    public String getMensajeEjecucion() {
+        return mensajeEjecucion;
     }
 
     private int calcularDanoTotal() {

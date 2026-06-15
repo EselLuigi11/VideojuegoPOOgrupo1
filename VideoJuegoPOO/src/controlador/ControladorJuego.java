@@ -4,6 +4,8 @@ import javax.swing.JOptionPane;
 import modelo.vista.PanelPersonaje;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import modelo.Partida;
 import modelo.RepositorioPartida;
 import modelo.Batalla;
@@ -11,7 +13,10 @@ import modelo.CatalogoBatalla;
 import modelo.Orquestador;
 import modelo.acciones.Atacar;
 import modelo.acciones.Defender;
+import modelo.entidades.Arquero;
+import modelo.entidades.Asesino;
 import modelo.entidades.Enemigo;
+import modelo.entidades.Guerrero;
 import modelo.entidades.Heroe;
 import modelo.vista.VistaMenuPrincipal;
 import modelo.vista.VistaBatalla;
@@ -117,7 +122,7 @@ public class ControladorJuego {
 					throw new IllegalStateException("No es el turno de un héroe o no quedan héroes vivos.");
 				}
 
-				List<Enemigo> enemigosVivos = orquestador.getEnemigosVivos();
+				List<Enemigo> enemigosVivos = orquestador.getBatallaActual().getEnemigosVivos();
 				if (enemigosVivos.isEmpty()) {
 					throw new IllegalStateException("No hay rivales en el campo de batalla.");
 				}
@@ -153,12 +158,13 @@ public class ControladorJuego {
 				
 				
 				// Ejecución del turno
-				
+				Map<Heroe, Integer> nivelesAntes = obtenerNivelesActuales();
 				Atacar ataque = new Atacar(heroeActivo, enemigoObjetivo);
 				String logBatalla = orquestador.procesarTurno(ataque);
-				this.vistaBatalla.appendHistorial(logBatalla);
+				vistaBatalla.appendHistorial(logBatalla);
 
 				actualizarBarrasPantalla();
+				comprobarSubidaDeNivel(nivelesAntes);
 				comprobarProgresoJuego();
 
 			} catch (Exception ex) {
@@ -174,11 +180,13 @@ public class ControladorJuego {
 				Heroe heroeActivo = orquestador.getHeroeActual();
 				if (heroeActivo == null) throw new IllegalStateException("No es turno de defenderse.");
 				
+				Map<Heroe, Integer> nivelesAntes = obtenerNivelesActuales();
 				Defender defensa = new Defender(heroeActivo);
 				String logBatalla = orquestador.procesarTurno(defensa);
-				this.vistaBatalla.appendHistorial(logBatalla);
+				vistaBatalla.appendHistorial(logBatalla);
 				
 				actualizarBarrasPantalla();
+				comprobarSubidaDeNivel(nivelesAntes);
 				comprobarProgresoJuego();
 
 			} catch (Exception ex) {
@@ -187,7 +195,62 @@ public class ControladorJuego {
 		});
 		
 		// ==========================================
-		// 3. GESTIÓN DEL INVENTARIO
+		// 3. GESTIÓN DEL BOTÓN HABILIDAD
+		// ==========================================
+		this.vistaBatalla.getPanelAcciones().getBtnHabilidad().addActionListener(e -> {
+			try {
+				Heroe heroeActivo = orquestador.getHeroeActual();
+				if (heroeActivo == null) {
+					throw new IllegalStateException("No es el turno de un héroe.");
+				}
+
+				Enemigo objetivo = null;
+
+				// Guerrero, Arquero y Asesino necesitan seleccionar un objetivo enemigo
+				if (heroeActivo instanceof Guerrero
+						|| heroeActivo instanceof Arquero
+						|| heroeActivo instanceof Asesino) {
+
+					List<Enemigo> enemigosVivos = orquestador.getBatallaActual().getEnemigosVivos();
+					if (enemigosVivos.isEmpty()) {
+						throw new IllegalStateException("No hay enemigos en el campo de batalla.");
+					}
+
+					String[] nombres = enemigosVivos.stream()
+							.map(Enemigo::getNombre).toArray(String[]::new);
+					String seleccion = (String) JOptionPane.showInputDialog(
+							vistaBatalla,
+							"Selecciona el objetivo de tu habilidad:",
+							"Usar Habilidad",
+							JOptionPane.QUESTION_MESSAGE,
+							null,
+							nombres,
+							nombres[0]
+					);
+
+					if (seleccion == null) return;
+
+					objetivo = enemigosVivos.stream()
+							.filter(en -> en.getNombre().equals(seleccion))
+							.findFirst()
+							.orElse(enemigosVivos.get(0));
+				}
+
+				Map<Heroe, Integer> nivelesAntes = obtenerNivelesActuales();
+				String logBatalla = orquestador.procesarHabilidad(heroeActivo, objetivo);
+				// La habilidad ya tiene log descriptivo de por sí
+				registrarAccionEnHistorial("", logBatalla);
+				actualizarBarrasPantalla();
+				comprobarSubidaDeNivel(nivelesAntes);
+				comprobarProgresoJuego();
+
+			} catch (Exception ex) {
+				JOptionPane.showMessageDialog(vistaBatalla, ex.getMessage(), "Habilidad Inválida", JOptionPane.ERROR_MESSAGE);
+			}
+		});
+
+		// ==========================================
+		// 4. GESTIÓN DEL INVENTARIO
 		// ==========================================
 		this.vistaBatalla.getPanelAcciones().getBtnUsarItem().addActionListener(e -> {
 		    try {
@@ -213,12 +276,15 @@ public class ControladorJuego {
 		            botones.get(idx).addActionListener(evt -> {
 		                try {
 		                    modelo.Item itemElegido = partida.getInventarioPartida().getItems().get(idx);
+		                    Map<Heroe, Integer> nivelesAntes = obtenerNivelesActuales();
 		                    modelo.Accion accion = orquestador.crearAccionUsarItem(heroeActivo, itemElegido);
 		                    String log = orquestador.procesarTurno(accion);
-		                    vistaBatalla.appendHistorial(log);
+		                    String msjAccion = heroeActivo.getNombre() + " usa el ítem " + itemElegido.getNombre() + ".";
+		                    registrarAccionEnHistorial(msjAccion, log);
 
 		                    vistaInventario.setVisible(false);
 		                    actualizarBarrasPantalla();
+		                    comprobarSubidaDeNivel(nivelesAntes);
 		                    comprobarProgresoJuego();
 		                } catch (Exception ex) {
 		                    javax.swing.JOptionPane.showMessageDialog(
@@ -245,8 +311,28 @@ public class ControladorJuego {
 		this.vistaBatalla.getPanelEstado().refrescarActivo(activo);
 	}
 
+	private Map<Heroe, Integer> obtenerNivelesActuales() {
+		Map<Heroe, Integer> niveles = new HashMap<>();
+		for (Heroe h : partida.getGrupo().getHeroesVivos()) {
+			niveles.put(h, h.getNivel());
+		}
+		return niveles;
+	}
+
+	private void comprobarSubidaDeNivel(Map<Heroe, Integer> nivelesAnteriores) {
+		for (Heroe h : partida.getGrupo().getHeroesVivos()) {
+			Integer nivelAnt = nivelesAnteriores.get(h);
+			if (nivelAnt != null && h.getNivel() > nivelAnt) {
+				JOptionPane.showMessageDialog(vistaBatalla,
+					"¡" + h.getNombre() + " ha subido al Nivel " + h.getNivel() + "!\nSus estadísticas base han mejorado.",
+					"¡Subida de Nivel!",
+					JOptionPane.INFORMATION_MESSAGE);
+			}
+		}
+	}
+
 	private void comprobarProgresoJuego() {
-		if (orquestador.getEnemigosVivos().isEmpty()) {
+		if (orquestador.getBatallaActual() == null || orquestador.getBatallaActual().getEnemigosVivos().isEmpty()) {
 			nivelActual++;
 			partida.setNivel(nivelActual);
 			
@@ -273,9 +359,35 @@ public class ControladorJuego {
 			}
 		}
 		
-		if (orquestador.getHeroesVivos().isEmpty() || !partida.isEstado()) {
+		if (orquestador.getBatallaActual() == null || orquestador.getBatallaActual().getHeroesVivos().isEmpty() || !partida.isEstado()) {
 			JOptionPane.showMessageDialog(vistaBatalla, "Tu equipo ha caído en combate.", "Game Over", JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
+		}
+	}
+
+	private void registrarAccionEnHistorial(String mensajeAccion, String logOrquestador) {
+		if (logOrquestador == null) logOrquestador = "";
+		
+		String logFinal = logOrquestador;
+		
+		if (mensajeAccion != null && !mensajeAccion.isEmpty()) {
+			// Si el log contiene la frase genérica, la reemplazamos con la acción específica
+			if (logFinal.matches("(?s).*acci[oó]n ejecutada.*")) {
+				logFinal = logFinal.replaceAll("(?i)acci[oó]n ejecutada\\.?", mensajeAccion);
+			} else {
+				// Fallback: lo insertamos debajo del encabezado del turno si no halla la frase
+				logFinal = logFinal.replaceFirst("(--- Turno \\d+ ---)", "$1\n" + mensajeAccion);
+				if (logFinal.equals(logOrquestador)) {
+					logFinal = mensajeAccion + "\n" + logFinal;
+				}
+			}
+		} else {
+			// Si no hay mensaje (ej. habilidades), solo eliminamos el texto genérico
+			logFinal = logFinal.replaceAll("(?i)acci[oó]n ejecutada\\.?\n?", "");
+		}
+
+		if (!logFinal.trim().isEmpty()) {
+			this.vistaBatalla.appendHistorial(logFinal.trim());
 		}
 	}
 }

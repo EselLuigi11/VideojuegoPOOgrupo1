@@ -36,10 +36,10 @@ public class PanelEstado extends JPanel {
     // 5 héroes × 110 = 550 > ALTO, así que usamos 2 columnas side-by-side.
     private static final int[][] POS_HEROES = {
     		{ 10,  10 },   // Héroe 1
-    	    { 10, 175 },   // Héroe 2  (155 + 20 de margen)
+    	    { 10, 200 },   // Héroe 2  (180 + 20 de margen)
     	    {190,  10 },   // Héroe 3
-    	    {190, 175 },   // Héroe 4
-    	    { 10, 340 }    // Héroe 5  (solo si hay 5 héroes; cabe en ALTO=420 ajustado)
+    	    {190, 200 },   // Héroe 4
+    	    {370,  10 }    // Héroe 5  (movido a la 3ra columna para no cortarse abajo)
     	};
 
     	private static final int[][] POS_ENEMIGOS = {
@@ -48,7 +48,7 @@ public class PanelEstado extends JPanel {
     	    {660,  290 }
     	};
 
-    private static final Dimension TAM_PANEL_HEROE   = new Dimension(170, 155);
+    private static final Dimension TAM_PANEL_HEROE   = new Dimension(170, 180);
     private static final Dimension TAM_PANEL_ENEMIGO = new Dimension(170, 130);
 
     // ─────────────────────────────────────────────────────────────────────────
