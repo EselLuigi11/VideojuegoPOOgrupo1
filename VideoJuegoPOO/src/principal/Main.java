@@ -26,9 +26,11 @@ public class Main {
         partida.getGrupo().agregarHeroe(new Curador ("Curador",  null, null));
 
         // ── Batalla inicial desde catálogo (nivel 1)
-        Batalla batallaInicial = CatalogoBatalla.getInstance()
-                .construirBatalla(1, new ArrayList<>(partida.getGrupo().getHeroesVivos()));
-        Orquestador orquestador = new Orquestador(batallaInicial, partida);
+        //Batalla batallaInicial = CatalogoBatalla.getInstance()
+        //        .construirBatalla(1, new ArrayList<>(partida.getGrupo().getHeroesVivos()));
+        //Orquestador orquestador = new Orquestador(batallaInicial, partida);
+        Orquestador orquestador = new Orquestador(null, partida);
+        orquestador.iniciarBatalla(1);
 
         // ── Vistas
         VistaMenuPrincipal menu       = new VistaMenuPrincipal();
