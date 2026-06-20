@@ -72,10 +72,6 @@ public class Batalla {
 		return vivos;
 	}
 
-	/**
-	 * Suma la experiencia total que otorgan TODOS los enemigos de esta batalla.
-	 * Cohesión POO: el cálculo vive en el Modelo (Batalla), no en el Controlador.
-	 */
 	public int getExperienciaTotalOtorgada() {
 		int total = 0;
 		for (Enemigo e : enemigos) {
@@ -84,56 +80,117 @@ public class Batalla {
 		return total;
 	}
 
-	public void otorgarRecompensas(Inventario inv, int numeroBatalla) {
-		if (inv == null) return;
+	/**
+	 * Otorga recompensas al terminar una batalla.
+	 * Devuelve la lista de ítems entregados para que el Controlador
+	 * los muestre en el mensaje de victoria.
+	 *
+	 * Batalla 1 → armadura por clase, se equipa automáticamente.
+	 * Batalla 2 → arma por clase, se equipa automáticamente.
+	 * Batalla 3 → pociones y equipo varios (sin cambios).
+	 */
+	public List<Item> otorgarRecompensas(Inventario inv, int numeroBatalla) {
+		List<Item> itemsEntregados = new ArrayList<>();
+		if (inv == null) return itemsEntregados;
 
 		List<Heroe> vivos = getHeroesVivos();
 		System.out.println("=== Recompensas de la batalla " + numeroBatalla + " ===");
 
 		switch (numeroBatalla) {
+
 			case 1:
+				// Una armadura por clase para cada héroe vivo.
+				// Se equipa automáticamente (equiparArmadura ya descuenta el bonus
+				// de la armadura anterior si había una, evitando acumulación).
 				for (Heroe h : vivos) {
-					Arma arma;
+					Armadura armadura;
 					if (h instanceof Guerrero) {
-						arma = new Arma("Espada de Hierro", "Espada de un goblin derrotado.", 8);
+						armadura = new Armadura("Armadura de Hierro", null, 15);
 					} else if (h instanceof Arquero) {
-						arma = new Arma("Arco Corto", "Arco ágil del campo de batalla.", 7);
+						armadura = new Armadura("Coraza de Cuero", null, 10);
 					} else if (h instanceof Asesino) {
-						arma = new Arma("Daga Envenenada", "Daga con filo goblin.", 9);
+						armadura = new Armadura("Cota de Sombra", null, 8);
 					} else if (h instanceof Mago) {
-						arma = new Arma("Bastón de Rama", "Canal arcano primitivo.", 5);
+						armadura = new Armadura("Manto Arcano", null, 6);
 					} else if (h instanceof Curador) {
-						arma = new Arma("Vara Sagrada", "Emana energía curativa.", 4);
+						armadura = new Armadura("Veste Sagrada", null, 7);
 					} else {
-						arma = new Arma("Arma Simple", "Botín básico.", 6);
+						armadura = new Armadura("Armadura Simple", null, 5);
 					}
-					h.equiparArma(arma);
-					System.out.println(h.getNombre() + " equipó: " + arma.getNombre());
+					h.equiparArmadura(armadura);          // auto-equip
+					itemsEntregados.add(armadura);
+					System.out.println(h.getNombre() + " equipó: " + armadura.getNombre()
+						+ " (+" + armadura.getplusDefensa() + " DEF)");
 				}
-				inv.agregarItem(new PocionVida("Poción de Vida", "Restaura 50 HP.", 50));
-				inv.agregarItem(new PocionVida("Poción de Vida", "Restaura 50 HP.", 50));
+				// Pociones de vida adicionales
+				PocionVida pv1 = new PocionVida("Poción de Vida", "Restaura 50 HP.", 50);
+				PocionVida pv2 = new PocionVida("Poción de Vida", "Restaura 50 HP.", 50);
+				inv.agregarItem(pv1);
+				inv.agregarItem(pv2);
+				itemsEntregados.add(pv1);
+				itemsEntregados.add(pv2);
 				break;
 
 			case 2:
-				inv.agregarItem(new PocionVida("Poción de Vida Mayor", "Restaura 80 HP.", 80));
-				inv.agregarItem(new PocionVida("Poción de Vida Mayor", "Restaura 80 HP.", 80));
-				inv.agregarItem(new PocionMana("Poción de Maná", "Restaura 40 MP.", 40));
-				inv.agregarItem(new Arma("Espada Reforzada", "Hoja de ladrón veterano.", 12));
+				// Un arma por clase para cada héroe vivo.
+				// Se equipa automáticamente.
+				for (Heroe h : vivos) {
+					Arma arma;
+					if (h instanceof Guerrero) {
+						arma = new Arma("Espada de Acero", null, 14);
+					} else if (h instanceof Arquero) {
+						arma = new Arma("Arco Largo", null, 12);
+					} else if (h instanceof Asesino) {
+						arma = new Arma("Daga Serrada", null, 16);
+					} else if (h instanceof Mago) {
+						arma = new Arma("Bastón de Cristal", null, 13);
+					} else if (h instanceof Curador) {
+						arma = new Arma("Báculo de Luz", null, 8);
+					} else {
+						arma = new Arma("Arma Simple", null, 6);
+					}
+					h.equiparArma(arma);                  // auto-equip
+					itemsEntregados.add(arma);
+					System.out.println(h.getNombre() + " equipó: " + arma.getNombre()
+						+ " (+" + arma.getPlusDano() + " ATQ)");
+				}
+				// Pociones adicionales
+				PocionVida pvm1 = new PocionVida("Poción de Vida Mayor", "Restaura 80 HP.", 80);
+				PocionVida pvm2 = new PocionVida("Poción de Vida Mayor", "Restaura 80 HP.", 80);
+				PocionMana pm   = new PocionMana("Poción de Maná", "Restaura 40 MP.", 40);
+				inv.agregarItem(pvm1);
+				inv.agregarItem(pvm2);
+				inv.agregarItem(pm);
+				itemsEntregados.add(pvm1);
+				itemsEntregados.add(pvm2);
+				itemsEntregados.add(pm);
 				break;
 
 			case 3:
-				inv.agregarItem(new PocionVida("Elixir de Vida", "Restaura 120 HP.", 120));
-				inv.agregarItem(new PocionVida("Elixir de Vida", "Restaura 120 HP.", 120));
-				inv.agregarItem(new Arma("Báculo del Gólem", "Forjado del núcleo del gólem.", 18));
-				inv.agregarItem(new Armadura("Loriga de Piedra", "Alta defensa del gólem.", 20));
+				PocionVida elixir1 = new PocionVida("Elixir de Vida", "Restaura 120 HP.", 120);
+				PocionVida elixir2 = new PocionVida("Elixir de Vida", "Restaura 120 HP.", 120);
+				Arma baculo        = new Arma("Báculo del Gólem", "Forjado del núcleo del gólem.", 18);
+				Armadura loriga    = new Armadura("Loriga de Piedra", "Alta defensa del gólem.", 20);
+				inv.agregarItem(elixir1);
+				inv.agregarItem(elixir2);
+				inv.agregarItem(baculo);
+				inv.agregarItem(loriga);
+				itemsEntregados.add(elixir1);
+				itemsEntregados.add(elixir2);
+				itemsEntregados.add(baculo);
+				itemsEntregados.add(loriga);
 				break;
 
 			default:
-				inv.agregarItem(new PocionVida("Poción de Vida", "Restaura 50 HP.", 50));
+				PocionVida def = new PocionVida("Poción de Vida", "Restaura 50 HP.", 50);
+				inv.agregarItem(def);
+				itemsEntregados.add(def);
 				break;
 		}
+
+		return itemsEntregados;
 	}
 
 	public List<Enemigo> getEnemigos() { return enemigos; }
-	public List<Heroe> getHeroes() { return heroes; }
+	public List<Heroe> getHeroes()    { return heroes; }
 }

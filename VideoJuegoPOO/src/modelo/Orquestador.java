@@ -19,6 +19,16 @@ public class Orquestador {
 	private boolean resultadoProcesado;
 	private int numeroBatallaActual;
 
+	/** Ítems entregados al ganar la última batalla (para mostrar en pantalla). */
+	private List<Item> ultimasRecompensas = new ArrayList<>();
+
+	/**
+	 * Constructor principal.
+	 * CORRECCIÓN: cuando la batalla se pasa desde Main (sin pasar por
+	 * iniciarBatalla), el número de batalla quedaba en 0 y otorgarRecompensas
+	 * caía en el caso default. Ahora se inicializa en 1 porque la batalla
+	 * inicial siempre es la número 1.
+	 */
 	public Orquestador(Batalla batallaActual, Partida partidaActual) {
 		this.batallaActual = batallaActual;
 		this.contadorTurnos = 0;
@@ -26,7 +36,7 @@ public class Orquestador {
 		this.ordenTurnos = new ArrayList<>();
 		this.indiceTurnoActual = 0;
 		this.resultadoProcesado = false;
-		this.numeroBatallaActual = 0;
+		this.numeroBatallaActual = 1;   // <-- CORRECCIÓN: era 0
 		actualizarOrdenTurnos();
 	}
 
@@ -48,6 +58,11 @@ public class Orquestador {
 
 	public Partida getPartidaActual() {
 		return partidaActual;
+	}
+
+	/** Lista de ítems entregados al ganar la última batalla. */
+	public List<Item> getUltimasRecompensas() {
+		return new ArrayList<>(ultimasRecompensas);
 	}
 
 	public EstadoBatalla getEstadoBatalla() {
@@ -164,7 +179,6 @@ public class Orquestador {
 				.append(": ").append(heroe.getNombre()).append(" --\n");
 		heroe.setEstaDefendiendo(false);
 
-		// Polimorfismo puro: el héroe concreto resuelve su propia habilidad.
 		String resultadoHab = heroe.usarHabilidadEspecial(
 				objetivo, batallaActual.getEnemigosVivos(), batallaActual.getHeroesVivos());
 		log.append(resultadoHab).append("\n");
@@ -331,7 +345,9 @@ public class Orquestador {
 			log.append("¡Los heroes han ganado la batalla!\n");
 			repartirExperiencia();
 			if (partidaActual != null) {
-				batallaActual.otorgarRecompensas(partidaActual.getInventarioPartida(), numeroBatallaActual);
+				// Guardamos la lista para que el Controlador la muestre en el popup
+				ultimasRecompensas = batallaActual.otorgarRecompensas(
+						partidaActual.getInventarioPartida(), numeroBatallaActual);
 			}
 		} else if (estadoFinal == EstadoBatalla.DERROTA) {
 			log.append("Game Over. Los enemigos ganaron.\n");
@@ -342,21 +358,7 @@ public class Orquestador {
 
 		return log.toString();
 	}
-	
-	private void repartirExperiencia() {
-		if (batallaActual == null) return;
-		List<Heroe> heroesVivos = batallaActual.getHeroesVivos();
-		if (heroesVivos.isEmpty()) return;
- 
-		for (Enemigo enemigo : batallaActual.getEnemigos()) {
-			if (enemigo != null) {
-				for (Heroe heroe : heroesVivos) {
-					enemigo.otorgarExperiencia(heroe);
-				}
-			}
-		}
-	}
-	/* MÉTODO ORIGINAL, ANTES DE UTILIZAR MÉTODO DE LA CLASE BATALLA. 
+
 	private void repartirExperiencia() {
 		if (batallaActual == null) return;
 		List<Heroe> heroesVivos = batallaActual.getHeroesVivos();
@@ -370,5 +372,4 @@ public class Orquestador {
 			}
 		}
 	}
-	*/
 }

@@ -7,7 +7,7 @@ public class Armadura extends Item {
 	private int plusDefensa;
 
 	public Armadura(String nombre, String descripcion, int defensa) {
-		super(nombre, descripcion);
+		super(nombre, descripcion != null ? descripcion : "");
 		this.plusDefensa = defensa;
 	}
 

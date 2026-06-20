@@ -7,7 +7,7 @@ public class Arma extends Item {
 	private int plusdano;
 
 	public Arma(String nombre, String descripcion, int dano) {
-		super(nombre, descripcion);
+		super(nombre, descripcion != null ? descripcion : "");
 		this.plusdano = dano;
 	}
 
@@ -19,8 +19,8 @@ public class Arma extends Item {
 		return plusdano;
 	}
 
-	public void setPlusDano(int plusdaño) {
-		this.plusdano = plusdaño;
+	public void setPlusDano(int plusdano) {
+		this.plusdano = plusdano;
 	}
 
 	public String toString() {
