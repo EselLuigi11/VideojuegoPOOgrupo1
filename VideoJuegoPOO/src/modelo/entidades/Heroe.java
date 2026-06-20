@@ -1,14 +1,14 @@
 package modelo.entidades;
 
 import java.util.HashMap;
+import java.util.List;
 
 import modelo.Arma;
 import modelo.Armadura;
 import modelo.Entidad;
 import modelo.Inventario;
 
-
-public class Heroe extends Entidad {
+public abstract class Heroe extends Entidad {
 	private static final long serialVersionUID = 1L;
 
 	private int experiencia;
@@ -19,7 +19,7 @@ public class Heroe extends Entidad {
 	private int danoCrit;
 	private Arma arma;
 	private Armadura armadura;
-    protected HashMap<Integer, StatsNivel> tablaDeNiveles;
+	protected HashMap<Integer, StatsNivel> tablaDeNiveles;
 
 	public Heroe(String nombre, int vida, int vidaMax,
 			int ataque, int defensa,
@@ -31,16 +31,31 @@ public class Heroe extends Entidad {
 
 		super(nombre, vida, vidaMax, ataque, defensa, velocidad, estaDefendiendo);
 
-        this.experiencia  = experiencia;
-        this.nivel        = nivel;
-        this.mana         = mana;
-        this.manaMax      = manaMax;
-        this.probCrit     = probCrit;
-        this.danoCrit     = danoCrit;
-        this.arma         = arma;
-        this.armadura     = armadura;
-        this.tablaDeNiveles = new HashMap<>();
+		this.experiencia = experiencia;
+		this.nivel = nivel;
+		this.mana = mana;
+		this.manaMax = manaMax;
+		this.probCrit = probCrit;
+		this.danoCrit = danoCrit;
+		this.tablaDeNiveles = new HashMap<>();
+
+		if (arma != null) equiparArma(arma);
+		if (armadura != null) equiparArmadura(armadura);
 	}
+
+	/**
+	 * Punto de extensión polimórfico: cada subclase concreta (Guerrero,
+	 * Mago, Arquero...) decide qué habilidad propia ejecutar, delegando
+	 * a su clase HabEsp* correspondiente. Elimina el if/instanceof del
+	 * Orquestador — el despacho ahora lo resuelve el dynamic dispatch de Java.
+	 *
+	 * @param objetivo      enemigo puntual elegido por el jugador (puede ser
+	 *                      null si la habilidad no apunta a un único objetivo,
+	 *                      como las de área o curación grupal)
+	 * @param enemigosVivos lista completa de enemigos vivos (habilidades de área)
+	 * @param aliadosVivos  lista completa de aliados vivos (habilidades de curación)
+	 */
+	public abstract String usarHabilidadEspecial(Enemigo objetivo, List<Enemigo> enemigosVivos, List<Heroe> aliadosVivos);
 
 	public int calcularDanoBase() {
 		int danoTotal = this.getAtaque();
@@ -77,61 +92,75 @@ public class Heroe extends Entidad {
 
 	public void subirNivel() {
 		this.nivel++;
-        System.out.println("¡" + this.getNombre() + " subió al nivel " + this.nivel + "!");
+		StatsNivel statsDelNivel = tablaDeNiveles.get(this.nivel);
+		if (statsDelNivel != null) {
+			this.setVidaMax(statsDelNivel.getVidaMax());
+			this.setAtaque(statsDelNivel.getAtaque());
+			this.setDefensa(statsDelNivel.getDefensa());
+			this.setVelocidad(statsDelNivel.getVelocidad());
+			this.manaMax = statsDelNivel.getManaMax();
+			this.probCrit = statsDelNivel.getProbCrit();
+			this.danoCrit = statsDelNivel.getDanoCrit();
+		} else {
+			this.setVidaMax(this.getVidaMax() + 20);
+			this.setAtaque(this.getAtaque() + 5);
+			this.setDefensa(this.getDefensa() + 5);
+			this.setManaMax(this.getManaMax() + 10);
+		}
+		this.setVida(this.getVidaMax());
+		this.setMana(this.manaMax);
+	}
 
-        StatsNivel statsDelNivel = tablaDeNiveles.get(this.nivel);
-        if (statsDelNivel != null) {
-            this.setVidaMax(statsDelNivel.getVidaMax());
-            this.setAtaque(statsDelNivel.getAtaque());
-            this.setDefensa(statsDelNivel.getDefensa());
-            this.setVelocidad(statsDelNivel.getVelocidad());
-            this.manaMax  = statsDelNivel.getManaMax();
-            this.probCrit = statsDelNivel.getProbCrit();
-            this.danoCrit = statsDelNivel.getDanoCrit();
-            System.out.println("  → Stats aplicados desde tabla: nivel " + this.nivel);
-        } else {
-            this.setVidaMax(this.getVidaMax() + 20);
-            this.setAtaque(this.getAtaque() + 5);
-            this.setDefensa(this.getDefensa() + 5);
-            this.setManaMax(this.getManaMax() + 10);
-            System.out.println("  → Stats aplicados con incremento genérico (nivel no definido en tabla).");
-        }
-        this.setVida(this.getVidaMax());
-        this.setMana(this.manaMax);
+	/**
+	 * Equipa un arma de forma NO acumulativa: si ya había una equipada,
+	 * primero se retira su bonus de ataque antes de sumar el de la nueva.
+	 * El stat base de ataque refleja siempre el equipo actual, nunca un
+	 * acumulado histórico de todo lo que se usó alguna vez.
+	 */
+	public void equiparArma(Arma nuevaArma) {
+		if (this.arma != null) {
+			aumentarAtaque(-this.arma.getPlusDano());
+		}
+		this.arma = nuevaArma;
+		if (nuevaArma != null) {
+			aumentarAtaque(nuevaArma.getPlusDano());
+		}
+	}
+
+	public void equiparArmadura(Armadura nuevaArmadura) {
+		if (this.armadura != null) {
+			aumentarDefensa(-this.armadura.getplusDefensa());
+		}
+		this.armadura = nuevaArmadura;
+		if (nuevaArmadura != null) {
+			aumentarDefensa(nuevaArmadura.getplusDefensa());
+		}
 	}
 
 	public String equiparArma(Arma arma, Inventario inventario) {
 		if (!inventario.contieneItem(arma)) {
 			return "El arma '" + arma.getNombre() + "' no está en la mochila.";
 		}
-		String msj = "";
-		if (this.arma != null) {
-			inventario.agregarItem(this.arma);
-			msj += this.getNombre() + " desequipa " + this.arma.getNombre() + " y ";
-		} else {
-			msj += this.getNombre() + " ";
-		}
-		this.arma = arma;
+		String msj = (this.arma != null)
+				? getNombre() + " desequipa " + this.arma.getNombre() + " y "
+				: getNombre() + " ";
+		if (this.arma != null) inventario.agregarItem(this.arma);
+		equiparArma(arma);
 		inventario.eliminarItem(arma);
-		msj += "equipa " + arma.getNombre() + ".";
-		return msj;
+		return msj + "equipa " + arma.getNombre() + ".";
 	}
 
 	public String equiparArmadura(Armadura armadura, Inventario inventario) {
 		if (!inventario.contieneItem(armadura)) {
 			return "La armadura '" + armadura.getNombre() + "' no está en la mochila.";
 		}
-		String msj = "";
-		if (this.armadura != null) {
-			inventario.agregarItem(this.armadura);
-			msj += this.getNombre() + " desequipa " + this.armadura.getNombre() + " y ";
-		} else {
-			msj += this.getNombre() + " ";
-		}
-		this.armadura = armadura;
+		String msj = (this.armadura != null)
+				? getNombre() + " desequipa " + this.armadura.getNombre() + " y "
+				: getNombre() + " ";
+		if (this.armadura != null) inventario.agregarItem(this.armadura);
+		equiparArmadura(armadura);
 		inventario.eliminarItem(armadura);
-		msj += "equipa " + armadura.getNombre() + ".";
-		return msj;
+		return msj + "equipa " + armadura.getNombre() + ".";
 	}
 
 	public void restaurarStatusCompleto() {
@@ -142,14 +171,8 @@ public class Heroe extends Entidad {
 		this.setEstaDefendiendo(false);
 	}
 
-	/**
-	 * Devuelve un texto formateado con el desglose de stats: base + bonus de equipo.
-	 * Ej: "Ataque: 20 (+8 arma) = 28"
-	 *
-	 * Cohesión POO: el cálculo de stats vive en el Modelo (Heroe), no en el Controlador.
-	 */
 	public String getResumenEstadisticas() {
-		int bonusAtaque  = (arma != null) ? arma.getPlusDano() : 0;
+		int bonusAtaque = (arma != null) ? arma.getPlusDano() : 0;
 		int bonusDefensa = (armadura != null) ? armadura.getplusDefensa() : 0;
 
 		StringBuilder sb = new StringBuilder();
@@ -157,12 +180,12 @@ public class Heroe extends Entidad {
 		sb.append("──────────────────────────\n");
 		sb.append("Vida:      ").append(getVida()).append(" / ").append(getVidaMax()).append("\n");
 		sb.append("Mana:      ").append(mana).append(" / ").append(manaMax).append("\n");
-		sb.append("Ataque:    ").append(getAtaque());
+		sb.append("Ataque:    ").append(getAtaque() - bonusAtaque);
 		if (bonusAtaque > 0) sb.append(" (+").append(bonusAtaque).append(" arma)");
-		sb.append(" = ").append(calcularDanoBase()).append("\n");
-		sb.append("Defensa:   ").append(getDefensa());
+		sb.append(" = ").append(getAtaque()).append("\n");
+		sb.append("Defensa:   ").append(getDefensa() - bonusDefensa);
 		if (bonusDefensa > 0) sb.append(" (+").append(bonusDefensa).append(" armadura)");
-		sb.append(" = ").append(getDefensa() + bonusDefensa).append("\n");
+		sb.append(" = ").append(getDefensa()).append("\n");
 		sb.append("Velocidad: ").append(getVelocidad()).append("\n");
 		sb.append("Crítico:   ").append(probCrit).append("% (x").append(danoCrit / 100.0).append(")\n");
 		sb.append("Arma:      ").append(arma != null ? arma.getNombre() : "Ninguna").append("\n");
@@ -192,8 +215,5 @@ public class Heroe extends Entidad {
 	public void setDanoCrit(int danoCrit) { this.danoCrit = danoCrit; }
 
 	public Arma getArma() { return arma; }
-	public void setArma(Arma arma) { this.arma = arma; }
-
 	public Armadura getArmadura() { return armadura; }
-	public void setArmadura(Armadura armadura) { this.armadura = armadura; }
 }
