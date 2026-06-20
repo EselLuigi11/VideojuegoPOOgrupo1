@@ -1,7 +1,7 @@
 package controlador;
 
 import javax.swing.JOptionPane;
-import modelo.vista.PanelPersonaje;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,9 +20,10 @@ import modelo.entidades.Enemigo;
 import modelo.entidades.Guerrero;
 import modelo.entidades.Heroe;
 import modelo.pociones.PocionVida;
-import modelo.vista.VistaMenuPrincipal;
-import modelo.vista.VistaBatalla;
-import modelo.vista.VistaInventario;
+import vista.PanelPersonaje;
+import vista.VistaBatalla;
+import vista.VistaInventario;
+import vista.VistaMenuPrincipal;
 
 public class ControladorJuego {
 	private Partida partida;

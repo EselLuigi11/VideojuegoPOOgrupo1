@@ -342,7 +342,21 @@ public class Orquestador {
 
 		return log.toString();
 	}
-
+	
+	private void repartirExperiencia() {
+		if (batallaActual == null) return;
+		List<Heroe> heroesVivos = batallaActual.getHeroesVivos();
+		if (heroesVivos.isEmpty()) return;
+ 
+		for (Enemigo enemigo : batallaActual.getEnemigos()) {
+			if (enemigo != null) {
+				for (Heroe heroe : heroesVivos) {
+					enemigo.otorgarExperiencia(heroe);
+				}
+			}
+		}
+	}
+	/* MÉTODO ORIGINAL, ANTES DE UTILIZAR MÉTODO DE LA CLASE BATALLA. 
 	private void repartirExperiencia() {
 		if (batallaActual == null) return;
 		List<Heroe> heroesVivos = batallaActual.getHeroesVivos();
@@ -356,4 +370,5 @@ public class Orquestador {
 			}
 		}
 	}
+	*/
 }

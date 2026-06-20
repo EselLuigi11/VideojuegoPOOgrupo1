@@ -8,7 +8,9 @@ import modelo.Orquestador;
 import modelo.Partida;
 import modelo.RepositorioPartida;
 import modelo.entidades.*;
-import modelo.vista.*;
+import vista.VistaBatalla;
+import vista.VistaInventario;
+import vista.VistaMenuPrincipal;
 
 public class Main {
 

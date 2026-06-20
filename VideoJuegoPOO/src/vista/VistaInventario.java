@@ -1,6 +1,6 @@
 // REEMPLAZAR VistaInventario.java completo:
 
-package modelo.vista;
+package vista;
 
 import javax.swing.*;
 import java.awt.*;

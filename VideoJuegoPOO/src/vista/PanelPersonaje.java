@@ -1,4 +1,4 @@
-package modelo.vista;
+package vista;
 
 import java.awt.*;
 import javax.swing.*;
