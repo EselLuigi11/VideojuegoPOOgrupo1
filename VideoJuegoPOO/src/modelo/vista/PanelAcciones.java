@@ -10,6 +10,7 @@ public class PanelAcciones extends JPanel {
     private JButton btnHabilidad;
     private JButton btnUsarItem;
     private JButton btnVerStats;
+    private JButton btnVerEquipo; // NUEVO: botón pedido en "Interfaz #3" del PDF de correcciones
     private JButton btnGuardarPartida;
 
     public PanelAcciones() {
@@ -18,6 +19,7 @@ public class PanelAcciones extends JPanel {
         btnHabilidad = new JButton("Habilidad");
         btnUsarItem = new JButton("Usar Ítem");
         btnVerStats = new JButton("Ver Stats");
+        btnVerEquipo = new JButton("Ver Equipo"); // NUEVO
         btnGuardarPartida = new JButton("Guardar Partida");
 
         add(btnAtacar);
@@ -25,6 +27,7 @@ public class PanelAcciones extends JPanel {
         add(btnHabilidad);
         add(btnUsarItem);
         add(btnVerStats);
+        add(btnVerEquipo); // NUEVO
         add(btnGuardarPartida);
     }
 
@@ -46,6 +49,11 @@ public class PanelAcciones extends JPanel {
 
     public JButton getBtnVerStats() {
         return btnVerStats;
+    }
+
+    // NUEVO
+    public JButton getBtnVerEquipo() {
+        return btnVerEquipo;
     }
 
     public JButton getBtnGuardarPartida() {
