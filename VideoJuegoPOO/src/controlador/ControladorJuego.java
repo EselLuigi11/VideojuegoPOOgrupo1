@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Random;
 import modelo.Partida;
 import modelo.RepositorioPartida;
 import modelo.Batalla;
@@ -18,6 +19,7 @@ import modelo.entidades.Asesino;
 import modelo.entidades.Enemigo;
 import modelo.entidades.Guerrero;
 import modelo.entidades.Heroe;
+import modelo.pociones.PocionVida;
 import modelo.vista.VistaMenuPrincipal;
 import modelo.vista.VistaBatalla;
 import modelo.vista.VistaInventario;
@@ -66,7 +68,6 @@ public class ControladorJuego {
 		    }
 		    //Si hay partida guardada, la cargamos y reconstruimos el estado del juego
 		    Partida cargada = repositorio.cargar();
-		    //Llama a la funcion cargar() del repositorio. Que devuelve un objeto Partida reconstruido a partir del archivo .dat, o null si hubo error.
 		    if (cargada != null) {
 		        this.partida = cargada;
 		        this.nivelActual = cargada.getNivel();
@@ -299,6 +300,47 @@ public class ControladorJuego {
 		            javax.swing.JOptionPane.WARNING_MESSAGE);
 		    }
 		});
+
+		// ==========================================
+		// 5. GESTIÓN DEL BOTÓN "VER STATS"
+		// ==========================================
+		this.vistaBatalla.getPanelAcciones().getBtnVerStats().addActionListener(e -> {
+			try {
+				List<Heroe> heroesVivos = partida.getGrupo().getHeroesVivos();
+				if (heroesVivos.isEmpty()) {
+					throw new IllegalStateException("No hay héroes vivos para mostrar.");
+				}
+
+				String[] nombres = heroesVivos.stream().map(Heroe::getNombre).toArray(String[]::new);
+				String seleccion = (String) JOptionPane.showInputDialog(
+					vistaBatalla,
+					"Selecciona un héroe para ver sus estadísticas:",
+					"Ver Estadísticas",
+					JOptionPane.QUESTION_MESSAGE,
+					null,
+					nombres,
+					nombres[0]
+				);
+
+				if (seleccion == null) return;
+
+				Heroe heroeElegido = heroesVivos.stream()
+					.filter(h -> h.getNombre().equals(seleccion))
+					.findFirst()
+					.orElse(heroesVivos.get(0));
+
+				// Cohesión: el texto lo arma el modelo (Heroe), el Controlador solo lo muestra
+				JOptionPane.showMessageDialog(
+					vistaBatalla,
+					heroeElegido.getResumenEstadisticas(),
+					"Estadísticas — " + heroeElegido.getNombre(),
+					JOptionPane.INFORMATION_MESSAGE
+				);
+
+			} catch (Exception ex) {
+				JOptionPane.showMessageDialog(vistaBatalla, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		});
 	}
 
 	// ── Métodos de Refactorización POO ────────────────────────────────────────
@@ -309,6 +351,12 @@ public class ControladorJuego {
 		// Resaltar al personaje actual
 		modelo.Entidad activo = orquestador.getPersonajeActual();
 		this.vistaBatalla.getPanelEstado().refrescarActivo(activo);
+
+		// Sincroniza el indicador visual de orden de turnos (DRY: único punto de actualización)
+		this.vistaBatalla.getPanelEstado().actualizarOrdenTurnos(orquestador.getOrdenTurnos());
+
+		// Fix de artefactos visuales: limpia restos de JOptionPane sobre los paneles
+		this.vistaBatalla.repintarCompleto();
 	}
 
 	private Map<Heroe, Integer> obtenerNivelesActuales() {
@@ -333,6 +381,10 @@ public class ControladorJuego {
 
 	private void comprobarProgresoJuego() {
 		if (orquestador.getBatallaActual() == null || orquestador.getBatallaActual().getEnemigosVivos().isEmpty()) {
+
+			// Calculamos el resumen de recompensas ANTES de pasar de nivel
+			String resumenRecompensas = generarResumenRecompensas();
+
 			nivelActual++;
 			partida.setNivel(nivelActual);
 			
@@ -345,7 +397,13 @@ public class ControladorJuego {
 			String msgCarga = orquestador.iniciarBatalla(nivelActual);
 
 			if (orquestador.getBatallaActual() != null) {
-				JOptionPane.showMessageDialog(vistaBatalla, "¡Victoria! Avanzando al Nivel " + nivelActual, "Fase Completada", JOptionPane.INFORMATION_MESSAGE);
+				// Mensaje de victoria enriquecido con loot y XP
+				JOptionPane.showMessageDialog(
+					vistaBatalla,
+					"¡VICTORIA!\n\n" + resumenRecompensas + "\n\nAvanzando al Nivel " + nivelActual,
+					"Fase Completada",
+					JOptionPane.INFORMATION_MESSAGE
+				);
 				this.vistaBatalla.appendHistorial("\n--- " + msgCarga + " ---");
 				// RE-INICIALIZAMOS la vista dinámica porque los enemigos cambiaron
 				this.vistaBatalla.getPanelEstado().inicializar(
@@ -354,7 +412,12 @@ public class ControladorJuego {
 				);
 				actualizarBarrasPantalla();
 			} else {
-				JOptionPane.showMessageDialog(vistaBatalla, "¡Ganaste el juego!", "Juego Completado", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(
+					vistaBatalla,
+					"¡VICTORIA FINAL!\n\n" + resumenRecompensas + "\n\n¡Ganaste el juego!",
+					"Juego Completado",
+					JOptionPane.INFORMATION_MESSAGE
+				);
 				System.exit(0);
 			}
 		}
@@ -363,6 +426,34 @@ public class ControladorJuego {
 			JOptionPane.showMessageDialog(vistaBatalla, "Tu equipo ha caído en combate.", "Game Over", JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		}
+	}
+
+	/**
+	 * Construye el texto de resumen de recompensas: experiencia total y
+	 * 1-2 pociones simuladas como drop. La experiencia ya fue otorgada
+	 * por el Orquestador (repartirExperiencia()); acá solo informamos el total.
+	 */
+	private String generarResumenRecompensas() {
+		Batalla batallaGanada = orquestador.getBatallaActual();
+		int expTotal = (batallaGanada != null) ? batallaGanada.getExperienciaTotalOtorgada() : 0;
+
+		// Simulamos el drop de 1 o 2 ítems aleatorios
+		Random rand = new Random();
+		int cantidadDrops = 1 + rand.nextInt(2); // 1 o 2
+		StringBuilder loot = new StringBuilder();
+
+		for (int i = 0; i < cantidadDrops; i++) {
+			int curacion = 30 + rand.nextInt(50); // entre 30 y 79 HP
+			PocionVida pocion = new PocionVida(
+				"Poción de Vida", "Restaura " + curacion + " HP.", curacion
+			);
+			partida.getInventarioPartida().agregarItem(pocion);
+			loot.append("  • ").append(pocion.getNombre())
+				.append(" (+").append(curacion).append(" HP)\n");
+		}
+
+		return "Experiencia obtenida: +" + expTotal + " XP\n"
+			+ "Botín recibido:\n" + loot.toString().stripTrailing();
 	}
 
 	private void registrarAccionEnHistorial(String mensajeAccion, String logOrquestador) {

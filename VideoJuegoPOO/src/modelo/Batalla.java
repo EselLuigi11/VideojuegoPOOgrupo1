@@ -72,6 +72,18 @@ public class Batalla {
 		return vivos;
 	}
 
+	/**
+	 * Suma la experiencia total que otorgan TODOS los enemigos de esta batalla.
+	 * Cohesión POO: el cálculo vive en el Modelo (Batalla), no en el Controlador.
+	 */
+	public int getExperienciaTotalOtorgada() {
+		int total = 0;
+		for (Enemigo e : enemigos) {
+			if (e != null) total += e.getExperienciaOtorgada();
+		}
+		return total;
+	}
+
 	public void otorgarRecompensas(Inventario inv, int numeroBatalla) {
 		if (inv == null) return;
 

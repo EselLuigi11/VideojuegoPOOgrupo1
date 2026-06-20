@@ -8,180 +8,130 @@ import modelo.entidades.Enemigo;
 import modelo.entidades.Heroe;
 
 /**
- * PanelEstado — contenedor dinámico de PanelPersonaje.
- *
- * CAMBIOS vs versión anterior:
- *  - Eliminado todo hardcodeo de "Guerrero", "Enemigo", etc.
- *  - inicializar(heroesVivos, enemigosVivos) construye los paneles en tiempo de ejecución.
- *  - Los héroes se posicionan en diagonal abajo-izquierda;
- *    los enemigos en columna arriba-derecha (igual que el layout original).
- *  - refreshTodos() delega en cada PanelPersonaje.refresh() → DRY.
- *  - Getters de lista para que el Controlador pueda iterar sin conocer posiciones.
+ * PanelEstado — contenedor dinámico de PanelPersonaje + indicador de orden de turnos.
  */
 public class PanelEstado extends JPanel {
 
-    // ── Paneles activos en esta batalla ──────────────────────────────────────
     private final List<PanelPersonaje> panelesHeroes   = new ArrayList<>();
     private final List<PanelPersonaje> panelesEnemigos = new ArrayList<>();
 
-    // ── Layout ────────────────────────────────────────────────────────────────
-    // EN: VideoJuegoPOO/src/modelo/vista/PanelEstado.java
-    // REEMPLAZAR las constantes de posición y tamaño:
+    // Franja de turnos: panel dedicado y SIEMPRE opaco, en vez de JLabel
+    // transparente. Un JLabel con fondo semi-transparente (alpha) sobre
+    // setLayout(null) es justamente el patrón que más arrastra residuos
+    // visuales en Swing porque su área "sucia" nunca queda 100% definida.
+    // Con un JPanel opaco + JLabel hijo 100% opaco, cada repaint() limpia
+    // su propio rectángulo de fondo sólido antes de dibujar el texto.
+    private final JPanel franjaTurnos;
+    private final JLabel lblOrdenTurnos;
 
     private static final int ANCHO = 900;
-    private static final int ALTO = 500;
+    private static final int ALTO  = 500;
+    private static final int FRANJA_ALTO = 32;
 
-    // Héroes: columna izquierda, de arriba a abajo, con margen suficiente.
-    // Cada panel mide 160×100 → gap vertical de 10px entre cada uno.
-    // 5 héroes × 110 = 550 > ALTO, así que usamos 2 columnas side-by-side.
     private static final int[][] POS_HEROES = {
-    		{ 10,  10 },   // Héroe 1
-    	    { 10, 200 },   // Héroe 2  (180 + 20 de margen)
-    	    {190,  10 },   // Héroe 3
-    	    {190, 200 },   // Héroe 4
-    	    {370,  10 }    // Héroe 5  (movido a la 3ra columna para no cortarse abajo)
-    	};
+        { 10,  10 }, { 10, 200 }, {190,  10 }, {190, 200 }, {370,  10 }
+    };
 
-    	private static final int[][] POS_ENEMIGOS = {
-    	    {660,  10  },
-    	    {660,  150 },
-    	    {660,  290 }
-    	};
+    private static final int[][] POS_ENEMIGOS = {
+        {660,  10  }, {660,  150 }, {660,  290 }
+    };
 
     private static final Dimension TAM_PANEL_HEROE   = new Dimension(170, 180);
     private static final Dimension TAM_PANEL_ENEMIGO = new Dimension(170, 130);
 
-    // ─────────────────────────────────────────────────────────────────────────
-
     public PanelEstado() {
         setLayout(null);
-        setOpaque(false); // el fondo lo pinta VistaBatalla
+        setOpaque(false);
         setPreferredSize(new Dimension(ANCHO, ALTO));
+
+        // ── Franja de turnos: 100% opaca, fondo sólido (sin alpha) ───────────
+        franjaTurnos = new JPanel(new BorderLayout());
+        franjaTurnos.setOpaque(true);
+        franjaTurnos.setBackground(new Color(10, 10, 20)); // sólido, sin transparencia
+        franjaTurnos.setBorder(BorderFactory.createLineBorder(new Color(90, 90, 60), 1));
+        franjaTurnos.setBounds(0, ALTO - FRANJA_ALTO, ANCHO, FRANJA_ALTO);
+
+        lblOrdenTurnos = new JLabel("Turnos: —", SwingConstants.CENTER);
+        lblOrdenTurnos.setFont(new Font("Monospaced", Font.BOLD, 13));
+        lblOrdenTurnos.setForeground(Color.YELLOW);
+        lblOrdenTurnos.setOpaque(false); // el fondo lo pone el JPanel padre, sólido
+
+        franjaTurnos.add(lblOrdenTurnos, BorderLayout.CENTER);
+        add(franjaTurnos);
     }
 
-    // ── API principal ─────────────────────────────────────────────────────────
-
-    /**
-     * Construye (o reconstruye) todos los PanelPersonaje a partir de las
-     * listas de entidades vivas. Llamar al inicio de cada batalla y al
-     * transicionar de nivel.
-     *
-     * @param heroes   Lista de héroes que participan en la batalla.
-     * @param enemigos Lista de enemigos que participan en la batalla.
-     */
     public void inicializar(List<Heroe> heroes, List<Enemigo> enemigos) {
-        // Limpiar paneles anteriores
         removeAll();
         panelesHeroes.clear();
         panelesEnemigos.clear();
+        add(franjaTurnos);
 
-        // ── Héroes (esquina inferior-izquierda, en diagonal) ──────────────────
         for (int i = 0; i < heroes.size() && i < POS_HEROES.length; i++) {
             PanelPersonaje panel = new PanelPersonaje(heroes.get(i));
             panel.setPreferredSize(TAM_PANEL_HEROE);
-            panel.setBounds(
-                POS_HEROES[i][0], POS_HEROES[i][1],
-                TAM_PANEL_HEROE.width, TAM_PANEL_HEROE.height
-            );
+            panel.setBounds(POS_HEROES[i][0], POS_HEROES[i][1], TAM_PANEL_HEROE.width, TAM_PANEL_HEROE.height);
             panelesHeroes.add(panel);
             add(panel);
         }
 
-        // ── Enemigos (esquina superior-derecha, en columna) ────────────────────
         for (int i = 0; i < enemigos.size() && i < POS_ENEMIGOS.length; i++) {
             PanelPersonaje panel = new PanelPersonaje(enemigos.get(i));
             panel.setPreferredSize(TAM_PANEL_ENEMIGO);
-            panel.setBounds(
-                POS_ENEMIGOS[i][0], POS_ENEMIGOS[i][1],
-                TAM_PANEL_ENEMIGO.width, TAM_PANEL_ENEMIGO.height
-            );
+            panel.setBounds(POS_ENEMIGOS[i][0], POS_ENEMIGOS[i][1], TAM_PANEL_ENEMIGO.width, TAM_PANEL_ENEMIGO.height);
             panelesEnemigos.add(panel);
             add(panel);
         }
 
+        // Reordenamos capas: los paneles de personajes van AL FRENTE de la
+        // franja de turnos para que esta quede siempre debajo en el z-order
+        // y no compita visualmente con nada que pueda superponerse.
+        setComponentZOrder(franjaTurnos, getComponentCount() - 1);
+
         revalidate();
         repaint();
     }
-    
-    public PanelPersonaje buscarPanelHeroe(Heroe heroe) { /*animaciones de heroe*/
 
-        for (PanelPersonaje panel : panelesHeroes) {
-
-            if (panel.getEntidad() == heroe) {
-                return panel;
-            }
-        }
-
-        return null;
-    }
-    
-    public PanelPersonaje buscarPanelEnemigo(Enemigo enemigo) { /*animaciones de enemigo*/
-        for (PanelPersonaje p : panelesEnemigos) {
-            if (p.getEntidad() == enemigo) {
-                return p;
-            }
-        }
+    public PanelPersonaje buscarPanelHeroe(Heroe heroe) {
+        for (PanelPersonaje p : panelesHeroes) if (p.getEntidad() == heroe) return p;
         return null;
     }
 
-    /**
-     * Refresca TODOS los paneles con el estado actual de sus entidades.
-     * El Controlador llama a este único método desde actualizarInterfazGrafica().
-     */
+    public PanelPersonaje buscarPanelEnemigo(Enemigo enemigo) {
+        for (PanelPersonaje p : panelesEnemigos) if (p.getEntidad() == enemigo) return p;
+        return null;
+    }
+
     public void refreshTodos() {
         for (PanelPersonaje p : panelesHeroes)   p.refresh();
         for (PanelPersonaje p : panelesEnemigos) p.refresh();
     }
 
-    /**
-     * Resalta el panel correspondiente a la entidad que tiene el turno actual.
-     * @param entidadActiva La entidad cuyo turno está en curso (puede ser null).
-     */
     public void refrescarActivo(modelo.Entidad entidadActiva) {
-        for (PanelPersonaje p : panelesHeroes) {
-            p.setActivo(p.getEntidad() == entidadActiva);
+        for (PanelPersonaje p : panelesHeroes)   p.setActivo(p.getEntidad() == entidadActiva);
+        for (PanelPersonaje p : panelesEnemigos) p.setActivo(p.getEntidad() == entidadActiva);
+    }
+
+    /**
+     * Actualiza el texto de orden de turnos. Como la franja ahora es un
+     * JPanel 100% opaco con fondo sólido, cada repaint() limpia su propio
+     * rectángulo antes de redibujar el texto — ya no hay solapamiento de
+     * texto viejo/nuevo en capas de gris.
+     */
+    public void actualizarOrdenTurnos(List<modelo.Entidad> ordenTurnos) {
+        if (ordenTurnos == null || ordenTurnos.isEmpty()) {
+            lblOrdenTurnos.setText("Turnos: —");
+        } else {
+            StringBuilder sb = new StringBuilder("Turnos:  ");
+            for (int i = 0; i < ordenTurnos.size(); i++) {
+                sb.append(ordenTurnos.get(i).getNombre());
+                if (i < ordenTurnos.size() - 1) sb.append("  →  ");
+            }
+            lblOrdenTurnos.setText(sb.toString());
         }
-        for (PanelPersonaje p : panelesEnemigos) {
-            p.setActivo(p.getEntidad() == entidadActiva);
-        }
+        franjaTurnos.revalidate();
+        franjaTurnos.repaint();
     }
 
-    // ── Getters de lista (para selección de objetivo en el Controlador) ───────
-
-    /** Paneles de los héroes en el orden en que fueron registrados. */
-    public List<PanelPersonaje> getPanelesHeroes() {
-        return panelesHeroes;
-    }
-
-    /** Paneles de los enemigos en el orden en que fueron registrados. */
-    public List<PanelPersonaje> getPanelesEnemigos() {
-        return panelesEnemigos;
-    }
-
-    // ── Compatibilidad con el Controlador viejo (delegación) ─────────────────
-    // Estos métodos evitan romper código existente mientras se migra.
-
-    /** @deprecated  Usa getPanelesHeroes().get(i) */
-    @Deprecated
-    public PanelPersonaje getPanelGuerrero() {
-        return panelesHeroes.isEmpty() ? null : panelesHeroes.get(0);
-    }
-
-    /** @deprecated  Usa getPanelesEnemigos().get(0) */
-    @Deprecated
-    public PanelPersonaje getPanelEnemigo1() {
-        return panelesEnemigos.size() > 0 ? panelesEnemigos.get(0) : null;
-    }
-
-    /** @deprecated  Usa getPanelesEnemigos().get(1) */
-    @Deprecated
-    public PanelPersonaje getPanelEnemigo2() {
-        return panelesEnemigos.size() > 1 ? panelesEnemigos.get(1) : null;
-    }
-
-    /** @deprecated  Usa getPanelesEnemigos().get(2) */
-    @Deprecated
-    public PanelPersonaje getPanelEnemigo3() {
-        return panelesEnemigos.size() > 2 ? panelesEnemigos.get(2) : null;
-    }
+    public List<PanelPersonaje> getPanelesHeroes()   { return panelesHeroes; }
+    public List<PanelPersonaje> getPanelesEnemigos() { return panelesEnemigos; }
 }

@@ -142,6 +142,34 @@ public class Heroe extends Entidad {
 		this.setEstaDefendiendo(false);
 	}
 
+	/**
+	 * Devuelve un texto formateado con el desglose de stats: base + bonus de equipo.
+	 * Ej: "Ataque: 20 (+8 arma) = 28"
+	 *
+	 * Cohesión POO: el cálculo de stats vive en el Modelo (Heroe), no en el Controlador.
+	 */
+	public String getResumenEstadisticas() {
+		int bonusAtaque  = (arma != null) ? arma.getPlusDano() : 0;
+		int bonusDefensa = (armadura != null) ? armadura.getplusDefensa() : 0;
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(getNombre()).append("  (Nivel ").append(nivel).append(")\n");
+		sb.append("──────────────────────────\n");
+		sb.append("Vida:      ").append(getVida()).append(" / ").append(getVidaMax()).append("\n");
+		sb.append("Mana:      ").append(mana).append(" / ").append(manaMax).append("\n");
+		sb.append("Ataque:    ").append(getAtaque());
+		if (bonusAtaque > 0) sb.append(" (+").append(bonusAtaque).append(" arma)");
+		sb.append(" = ").append(calcularDanoBase()).append("\n");
+		sb.append("Defensa:   ").append(getDefensa());
+		if (bonusDefensa > 0) sb.append(" (+").append(bonusDefensa).append(" armadura)");
+		sb.append(" = ").append(getDefensa() + bonusDefensa).append("\n");
+		sb.append("Velocidad: ").append(getVelocidad()).append("\n");
+		sb.append("Crítico:   ").append(probCrit).append("% (x").append(danoCrit / 100.0).append(")\n");
+		sb.append("Arma:      ").append(arma != null ? arma.getNombre() : "Ninguna").append("\n");
+		sb.append("Armadura:  ").append(armadura != null ? armadura.getNombre() : "Ninguna");
+		return sb.toString();
+	}
+
 	public HashMap<Integer, StatsNivel> getTablaDeNiveles() { return tablaDeNiveles; }
 	public void setTablaDeNiveles(HashMap<Integer, StatsNivel> t) { this.tablaDeNiveles = t; }
 
