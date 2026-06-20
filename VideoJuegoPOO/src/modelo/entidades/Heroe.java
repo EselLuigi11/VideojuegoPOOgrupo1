@@ -43,18 +43,10 @@ public abstract class Heroe extends Entidad {
 		if (armadura != null) equiparArmadura(armadura);
 	}
 
-	/**
-	 * Punto de extensión polimórfico: cada subclase concreta (Guerrero,
-	 * Mago, Arquero...) decide qué habilidad propia ejecutar, delegando
-	 * a su clase HabEsp* correspondiente. Elimina el if/instanceof del
-	 * Orquestador — el despacho ahora lo resuelve el dynamic dispatch de Java.
-	 *
-	 * @param objetivo      enemigo puntual elegido por el jugador (puede ser
-	 *                      null si la habilidad no apunta a un único objetivo,
-	 *                      como las de área o curación grupal)
-	 * @param enemigosVivos lista completa de enemigos vivos (habilidades de área)
-	 * @param aliadosVivos  lista completa de aliados vivos (habilidades de curación)
-	 */
+	// MODIFICADO: método contractual polimórfico. Cada subclase concreta
+	// (Guerrero, Mago, Arquero...) implementa su propia habilidad delegando
+	// a su clase HabEsp* correspondiente. Reemplaza el bloque if/instanceof
+	// que existía en Orquestador.ejecutarHabilidadStr().
 	public abstract String usarHabilidadEspecial(Enemigo objetivo, List<Enemigo> enemigosVivos, List<Heroe> aliadosVivos);
 
 	public int calcularDanoBase() {
@@ -111,12 +103,10 @@ public abstract class Heroe extends Entidad {
 		this.setMana(this.manaMax);
 	}
 
-	/**
-	 * Equipa un arma de forma NO acumulativa: si ya había una equipada,
-	 * primero se retira su bonus de ataque antes de sumar el de la nueva.
-	 * El stat base de ataque refleja siempre el equipo actual, nunca un
-	 * acumulado histórico de todo lo que se usó alguna vez.
-	 */
+	// MODIFICADO: equipar arma deja de ser acumulativo. Si ya había una
+	// equipada, primero se resta su bonus de ataque antes de sumar el de
+	// la nueva. El stat de ataque siempre refleja el equipo actual, nunca
+	// un acumulado histórico de todo lo que se usó alguna vez.
 	public void equiparArma(Arma nuevaArma) {
 		if (this.arma != null) {
 			aumentarAtaque(-this.arma.getPlusDano());
@@ -127,6 +117,7 @@ public abstract class Heroe extends Entidad {
 		}
 	}
 
+	// MODIFICADO: misma lógica que equiparArma(), aplicada a defensa.
 	public void equiparArmadura(Armadura nuevaArmadura) {
 		if (this.armadura != null) {
 			aumentarDefensa(-this.armadura.getplusDefensa());
@@ -137,6 +128,9 @@ public abstract class Heroe extends Entidad {
 		}
 	}
 
+	// MODIFICADO: ahora delega en equiparArma(Arma) en vez de asignar el
+	// campo directamente, así el bonus de ataque se recalcula siempre
+	// pasando por el mismo punto único de la lógica de equipamiento.
 	public String equiparArma(Arma arma, Inventario inventario) {
 		if (!inventario.contieneItem(arma)) {
 			return "El arma '" + arma.getNombre() + "' no está en la mochila.";
@@ -190,6 +184,37 @@ public abstract class Heroe extends Entidad {
 		sb.append("Crítico:   ").append(probCrit).append("% (x").append(danoCrit / 100.0).append(")\n");
 		sb.append("Arma:      ").append(arma != null ? arma.getNombre() : "Ninguna").append("\n");
 		sb.append("Armadura:  ").append(armadura != null ? armadura.getNombre() : "Ninguna");
+		return sb.toString();
+	}
+
+	// NUEVO: texto de la pantalla de equipamiento pedida en la corrección
+	// "Interfaz #3". Cohesión POO: el Heroe describe su propio equipo,
+	// el Controlador solo lo muestra en un JOptionPane.
+	public String getResumenEquipamiento() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Equipamiento de ").append(getNombre()).append("\n");
+		sb.append("──────────────────────────\n");
+
+		sb.append("Arma:      ");
+		if (arma != null) {
+			sb.append(arma.getNombre())
+			  .append("  (+").append(arma.getPlusDano()).append(" ataque)\n");
+			sb.append("           ").append(arma.getDescripcion()).append("\n");
+		} else {
+			sb.append("Ninguna\n");
+		}
+
+		sb.append("Armadura:  ");
+		if (armadura != null) {
+			sb.append(armadura.getNombre())
+			  .append("  (+").append(armadura.getplusDefensa()).append(" defensa)\n");
+			sb.append("           ").append(armadura.getDescripcion()).append("\n");
+		} else {
+			sb.append("Ninguna\n");
+		}
+
+		sb.append("\nAtaque total:  ").append(getAtaque());
+		sb.append("\nDefensa total: ").append(getDefensa());
 		return sb.toString();
 	}
 
